@@ -12,12 +12,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Meu App com Tema',
+      title: 'Compasso Fiscal',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.themeData,
-      darkTheme: AppTheme.darkThemeData,
-      //themeMode: ThemeMode.system,
-      themeMode: ThemeMode.light, // Forçar tema claro
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.system,
       home: const MainLayout(),
     );
   }

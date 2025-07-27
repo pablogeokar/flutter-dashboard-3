@@ -31,49 +31,31 @@ class _MainScreenState extends State<MainLayout> {
   // Dados dos itens de navegação centralizados
   static const List<NavigationItem> _navigationItems = [
     NavigationItem(
-      screen: BlankScreen(),
+      screen: BlankScreen(title: 'Dashboard'),
       title: 'Dashboard',
       icon: Icons.dashboard,
       color: Colors.blue,
     ),
     NavigationItem(
-      screen: BlankScreen(),
+      screen: BlankScreen(title: 'Membros'),
       title: 'Membros',
-      icon: Icons.people,
+      icon: Icons.people_alt,
       color: Color(0xFF00BCD4),
     ),
     NavigationItem(
-      screen: BlankScreen(),
+      screen: BlankScreen(title: 'Contribuições'),
       title: 'Contribuições',
-      icon: Icons.monetization_on,
+      icon: Icons.payments,
       color: Colors.lightGreen,
     ),
     NavigationItem(
-      screen: BlankScreen(),
-      title: 'Entradas',
-      icon: Icons.trending_up,
-      color: Colors.green,
-    ),
-    NavigationItem(
-      screen: BlankScreen(),
-      title: 'Saídas',
-      icon: Icons.trending_down,
-      color: Colors.red,
-    ),
-    NavigationItem(
-      screen: BlankScreen(),
+      screen: BlankScreen(title: 'Relatórios'),
       title: 'Relatórios',
       icon: Icons.analytics,
       color: Colors.amber,
     ),
     NavigationItem(
-      screen: BlankScreen(),
-      title: 'Cadastros',
-      icon: Icons.people,
-      color: Colors.purple,
-    ),
-    NavigationItem(
-      screen: BlankScreen(),
+      screen: BlankScreen(title: 'Configurações'),
       title: 'Configurações',
       icon: Icons.settings,
       color: Colors.grey,
