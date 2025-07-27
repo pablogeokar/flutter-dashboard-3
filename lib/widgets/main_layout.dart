@@ -27,7 +27,6 @@ class MainLayout extends StatefulWidget {
 
 class _MainScreenState extends State<MainLayout> {
   int _selectedIndex = 0;
-  final String _appVersion = '';
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   // Dados dos itens de navegação centralizados
@@ -69,7 +68,6 @@ class _MainScreenState extends State<MainLayout> {
   @override
   void initState() {
     super.initState();
-    //_loadAppVersion();
   }
 
   @override
@@ -186,62 +184,54 @@ class _MainScreenState extends State<MainLayout> {
   Widget _buildSidebarHeader() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      padding: const EdgeInsets.all(24),
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        // Header com gradiente azul
-        //gradient: isDark ? null : AppTheme.sidebarHeaderGradient,
-        color: isDark ? const Color(0xFF2A2A2A) : null,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.transparent
-                  : Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-            ),
+    return Column(
+      children: [
+        // Logo principal no topo da sidebar
+        Container(
+          padding: const EdgeInsets.all(20),
+          child: Center(
             child: Image.asset(
-              'assets/images/logo-loja.png',
-              height: 128, // Reduzido para melhor proporção
-              width: 128,
+              isDark ? 'assets/images/logo-dark.png' : 'assets/images/logo.png',
+              height: 80,
+              fit: BoxFit.contain,
             ),
           ),
-          _buildCompanyInfo(),
-          if (_appVersion.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
+        ),
+        // Container com informações da empresa
+        Container(
+          padding: const EdgeInsets.all(20),
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF2A2A2A) : Colors.blueGrey[50],
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.white.withValues(alpha: 0.2),
+                    ? Colors.black.withValues(alpha: 0.3)
+                    : Colors.grey.withValues(alpha: 0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Logo da loja centralizada e com melhor proporção
+              ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.2)
-                      : Colors.white.withValues(alpha: 0.3),
-                  width: 1,
+                child: Image.asset(
+                  'assets/images/logo-loja.png',
+                  height: 80,
+                  fit: BoxFit.contain,
                 ),
               ),
-              child: Text(
-                _appVersion,
-                style: TextStyle(
-                  color: isDark ? Colors.white : Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
+              const SizedBox(height: 16),
+              _buildCompanyInfo(),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -339,7 +329,7 @@ class _MainScreenState extends State<MainLayout> {
                     item.icon,
                     color: isSelected
                         ? (isDark ? item.color : AppTheme.primary)
-                        : (isDark ? Colors.grey[400] : AppTheme.textSecondary),
+                        : (isDark ? Colors.grey[500] : AppTheme.textSecondary),
                     size: 20,
                   ),
                 ),
@@ -349,7 +339,7 @@ class _MainScreenState extends State<MainLayout> {
                   style: TextStyle(
                     color: isSelected
                         ? (isDark ? AppTheme.textOnDark : AppTheme.primary)
-                        : (isDark ? Colors.grey[300] : AppTheme.textPrimary),
+                        : (isDark ? Colors.grey[500] : AppTheme.textPrimary),
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     fontSize: 15,
                   ),
@@ -461,11 +451,12 @@ class _MainScreenState extends State<MainLayout> {
 
   Widget _buildAppBar({bool showMenuButton = false}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Container(
-      height: 80,
+      height: 70,
       decoration: BoxDecoration(
-        //color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+        color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
         border: Border(
           bottom: BorderSide(
             color: isDark
@@ -483,31 +474,29 @@ class _MainScreenState extends State<MainLayout> {
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 12, vertical: 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Image.asset(
-                'assets/images/logo.png',
-                height: 120, // Reduzido para melhor proporção
-                width: 120,
+          if (showMenuButton) ...[
+            SizedBox(width: isMobile ? 2 : 4),
+            IconButton(
+              icon: Icon(
+                Icons.menu,
+                color: isDark ? AppTheme.textOnDark : AppTheme.primary,
+                size: isMobile ? 20 : 24,
               ),
-              if (showMenuButton) ...[
-                IconButton(
-                  icon: Icon(
-                    Icons.menu,
-                    color: isDark ? AppTheme.textOnDark : AppTheme.primary,
-                  ),
-                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-                ),
-                const SizedBox(width: 8),
-              ],
-              _buildAppBarTitle(),
-            ],
-          ),
-          _buildAppBarActions(),
+              onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+              padding: const EdgeInsets.all(4),
+              constraints: BoxConstraints(
+                minWidth: isMobile ? 32 : 40,
+                minHeight: isMobile ? 32 : 40,
+              ),
+            ),
+          ],
+          SizedBox(width: isMobile ? 4 : 8),
+          Expanded(child: _buildAppBarTitle()),
+          if (!isMobile) _buildAppBarActions(),
+          if (isMobile) _buildNotificationButton(),
         ],
       ),
     );
@@ -515,30 +504,35 @@ class _MainScreenState extends State<MainLayout> {
 
   Widget _buildAppBarTitle() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
             color: isDark
                 ? _currentItem.color.withValues(alpha: 0.2)
                 : AppTheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(6),
           ),
           child: Icon(
             _currentItem.icon,
             color: isDark ? _currentItem.color : AppTheme.primary,
-            size: 20,
+            size: isMobile ? 16 : 20,
           ),
         ),
-        const SizedBox(width: 12),
-        Text(
-          _currentItem.title,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: isDark ? AppTheme.textOnDark : AppTheme.textPrimary,
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            _currentItem.title,
+            style: TextStyle(
+              fontSize: isMobile ? 16 : 20,
+              fontWeight: FontWeight.w600,
+              color: isDark ? AppTheme.textOnDark : AppTheme.textPrimary,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
@@ -546,7 +540,14 @@ class _MainScreenState extends State<MainLayout> {
   }
 
   Widget _buildAppBarActions() {
-    return Row(children: [..._buildActionButtons()]);
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: isMobile
+          ? [_buildNotificationButton()] // Apenas notificação no mobile
+          : [..._buildActionButtons()], // Todos os botões no desktop
+    );
   }
 
   Widget _buildCompanyInfo() {
@@ -558,17 +559,21 @@ class _MainScreenState extends State<MainLayout> {
       children: [
         Text(
           'Harmonia, Luz e Sigilo nº 46',
+          textAlign: TextAlign.center,
           style: TextStyle(
-            color: isDark ? Colors.grey[600] : AppTheme.textSecondary,
+            color: isDark ? Colors.grey[300] : AppTheme.textPrimary,
             fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
           ),
         ),
+        const SizedBox(height: 4),
         Text(
           'CNPJ: 12.345.678/0001-90',
+          textAlign: TextAlign.center,
           style: TextStyle(
-            color: isDark ? Colors.grey[600] : AppTheme.textSecondary,
+            color: isDark ? Colors.grey[400] : AppTheme.textSecondary,
             fontSize: 12,
+            fontWeight: FontWeight.w400,
           ),
         ),
       ],
