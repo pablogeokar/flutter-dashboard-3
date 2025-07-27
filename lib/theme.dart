@@ -9,55 +9,71 @@ class AppTheme {
   static const Color errorColor = Color(0xFFDC2626);
 
   // Texto
-  static const Color textPrimary = Color(
-    0xFF1F2937,
-  ); // Cinza mais escuro para melhor contraste
-  static const Color textSecondary = Color(
-    0xFF6B7280,
-  ); // Cinza médio para textos secundários
-  static const Color textOnDark = Color(
-    0xFFF2F4F8,
-  ); // Texto claro sobre fundo escuro
+  static const Color textPrimary = Color(0xFF1F2937);
+  static const Color textSecondary = Color(0xFF6B7280);
+  static const Color textOnDark = Color(0xFFF2F4F8);
 
-  // Backgrounds - Hierarquia visual melhorada
+  // Backgrounds - Melhor contraste e hierarquia
   static const Color background = Color(
-    0xFFF8FAFC,
+    0xFFF1F5F9,
   ); // Fundo principal mais neutro
-  static const Color card = Color(0xFFFFFFFF); // Cartões permanecem brancos
+  static const Color card = Color(0xFFFFFFFF); // Cartões brancos para contraste
+
+  // Sidebar com mais contraste
+  static const Color sidebarBackground = Color(
+    0xFFFFFFFF,
+  ); // Sidebar branca pura
+  static const Color sidebarShadow = Color(0xFF1C2D4A); // Sombra mais definida
+
+  // Surfaces com melhor hierarquia
   static const Color surface = Color(
-    0xFFEFF6FF,
-  ); // Sidebar com tom azulado muito sutil
-  static const Color surfaceVariant = Color(
     0xFFE2E8F0,
-  ); // Variante com mais contraste
-  static const Color surfaceAccent = Color(
-    0xFFDCECF9,
-  ); // Para elementos de destaque na sidebar
+  ); // Botões e elementos interativos
+  static const Color surfaceVariant = Color(0xFFCBD5E1);
+  static const Color surfaceAccent = Color(0xFFDCECF9);
 
   // Cores de estado
-  static const Color error = Color(0xFFDC2626); // Vermelho mais vibrante
-  static const Color success = Color(0xFF059669); // Verde mais definido
-  static const Color warning = Color(0xFFD97706); // Laranja para avisos
-  static const Color info = Color(0xFF0284C7); // Azul para informações
+  static const Color error = Color(0xFFDC2626);
+  static const Color success = Color(0xFF059669);
+  static const Color warning = Color(0xFFD97706);
+  static const Color info = Color(0xFF0284C7);
 
-  // Cores específicas para navegação
-  static const Color navHover = Color(0xFFF1F5F9); // Hover sutil
+  // Cores específicas para navegação - Mais contrastadas
+  static const Color navHover = Color(0xFFF8FAFC);
   static const Color navSelected = Color(
     0xFFE0F2FE,
-  ); // Background do item selecionado
-  static const Color navBorder = Color(0xFFCBD5E1); // Bordas sutis
+  ); // Azul claro para selecionado
+  static const Color navBorder = Color(0xFFE2E8F0); // Bordas mais visíveis
 
-  // Gradientes para elementos especiais
+  // Cores para separação visual
+  static const Color divider = Color(0xFFE2E8F0);
+  static const Color dividerDark = Color(0xFF374151);
+
+  // Gradientes atualizados
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [Color(0xFF1C2D4A), Color(0xFF2563EB)],
   );
 
+  // Gradiente mais sutil para a sidebar
   static const LinearGradient sidebarGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xFFEFF6FF), Color(0xFFF8FAFC)],
+    colors: [
+      Color(0xFFFFFFFF), // Branco puro no topo
+      Color(0xFFFAFBFC), // Levemente cinza no fundo
+    ],
+  );
+
+  // Gradiente para o header da sidebar
+  static const LinearGradient sidebarHeaderGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      Color(0xFF1C2D4A), // Azul escuro
+      Color(0xFF2563EB), // Azul mais claro
+    ],
   );
 
   // ThemeData claro
@@ -89,9 +105,9 @@ class AppTheme {
     return ThemeData(
       brightness: Brightness.dark,
       primaryColor: primary,
-      scaffoldBackgroundColor: const Color(0xFF121212),
+      scaffoldBackgroundColor: const Color(0xFF0F0F0F),
       appBarTheme: const AppBarTheme(
-        backgroundColor: primary,
+        backgroundColor: Color(0xFF1A1A1A),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -116,8 +132,8 @@ class AppTheme {
       primary: primaryColor,
       secondary: secondaryColor,
       error: errorColor,
-      surface: const Color(0xFFEFF6FF),
-      surfaceContainerLowest: const Color(0xFFF8FAFC),
+      surface: const Color(0xFFE2E8F0),
+      surfaceContainerLowest: background,
     ),
     appBarTheme: const AppBarTheme(
       centerTitle: false,
@@ -125,7 +141,7 @@ class AppTheme {
       scrolledUnderElevation: 2,
     ),
     cardTheme: const CardThemeData(
-      elevation: 1,
+      elevation: 2,
       margin: EdgeInsets.all(8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -142,7 +158,7 @@ class AppTheme {
       secondary: secondaryColor,
       error: errorColor,
       surface: const Color(0xFF1A1A1A),
-      surfaceContainerLowest: const Color(0xFF121212),
+      surfaceContainerLowest: const Color(0xFF0F0F0F),
     ),
     appBarTheme: const AppBarTheme(
       centerTitle: false,

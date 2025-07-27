@@ -138,9 +138,8 @@ class _MainScreenState extends State<MainLayout> {
     return Container(
       width: 280,
       decoration: BoxDecoration(
-        // Usar gradiente no modo light para mais vida
-        gradient: isDark ? null : AppTheme.sidebarGradient,
-        color: isDark ? const Color(0xFF1A1A1A) : null,
+        // Sidebar com fundo branco puro no modo claro
+        color: isDark ? const Color(0xFF1A1A1A) : AppTheme.sidebarBackground,
         borderRadius: const BorderRadius.only(
           topRight: Radius.circular(24),
           bottomRight: Radius.circular(24),
@@ -148,19 +147,21 @@ class _MainScreenState extends State<MainLayout> {
         border: Border(
           right: BorderSide(
             color: isDark
-                ? Colors.grey.withOpacity(0.2)
-                : AppTheme.navBorder.withOpacity(0.3),
-            width: 1,
+                ? Colors.grey.withValues(alpha: 0.2)
+                : AppTheme.navBorder,
+            width: 1.5, // Borda mais visível
           ),
         ),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withValues(alpha: 0.3)
-                : const Color(0xFF1C2D4A).withValues(alpha: 0.08),
-            blurRadius: isDark ? 10 : 12,
-            offset: const Offset(2, 0),
-            spreadRadius: isDark ? 0 : 1,
+                ? Colors.black.withValues(alpha: 0.4)
+                : AppTheme.sidebarShadow.withValues(
+                    alpha: 0.12,
+                  ), // Sombra mais forte
+            blurRadius: isDark ? 12 : 20,
+            offset: const Offset(3, 0),
+            spreadRadius: isDark ? 0 : 2,
           ),
         ],
       ),
@@ -187,70 +188,58 @@ class _MainScreenState extends State<MainLayout> {
 
     return Container(
       padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        // Header com gradiente azul
+        //gradient: isDark ? null : AppTheme.sidebarHeaderGradient,
+        color: isDark ? const Color(0xFF2A2A2A) : null,
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.transparent
+                  : Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Image.asset(
-              'assets/images/logo.png',
-              height: 160,
-              width: 160,
+              'assets/images/logo-loja.png',
+              height: 128, // Reduzido para melhor proporção
+              width: 128,
             ),
           ),
-          const SizedBox(height: 16),
-          Text(
-            'Compasso Fiscal',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: isDark ? AppTheme.textOnDark : AppTheme.primary,
-              letterSpacing: 0.5,
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Gestão Financeira',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: isDark ? Colors.grey[600] : AppTheme.textSecondary,
-                  fontWeight: FontWeight.w500,
+          _buildCompanyInfo(),
+          if (_appVersion.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : Colors.white.withValues(alpha: 0.3),
+                  width: 1,
                 ),
               ),
-              if (_appVersion.isNotEmpty) ...[
-                const SizedBox(height: 2, width: 16),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.transparent
-                        : AppTheme.secondary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.2)
-                          : AppTheme.secondary.withOpacity(0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Text(
-                    _appVersion,
-                    style: TextStyle(
-                      color: isDark ? Colors.grey : AppTheme.secondary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
+              child: Text(
+                _appVersion,
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.3,
                 ),
-              ],
-            ],
-          ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -260,7 +249,7 @@ class _MainScreenState extends State<MainLayout> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       height: 1,
       decoration: BoxDecoration(
         gradient: isDark
@@ -268,11 +257,11 @@ class _MainScreenState extends State<MainLayout> {
             : LinearGradient(
                 colors: [
                   Colors.transparent,
-                  AppTheme.navBorder.withOpacity(0.5),
+                  AppTheme.divider.withValues(alpha: 0.8),
                   Colors.transparent,
                 ],
               ),
-        color: isDark ? Colors.grey.withOpacity(0.2) : null,
+        color: isDark ? AppTheme.dividerDark.withValues(alpha: 0.3) : null,
       ),
     );
   }
@@ -300,7 +289,6 @@ class _MainScreenState extends State<MainLayout> {
           borderRadius: BorderRadius.circular(12),
           onTap: () {
             setState(() => _selectedIndex = index);
-            // Fechar drawer no mobile após seleção
             if (ResponsiveLayout.isMobile(context)) {
               Navigator.of(context).pop();
             }
@@ -312,21 +300,21 @@ class _MainScreenState extends State<MainLayout> {
               color: isSelected
                   ? (isDark
                         ? item.color.withValues(alpha: 0.15)
-                        : AppTheme.navSelected)
+                        : AppTheme.primary.withValues(alpha: 0.08))
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
               border: isSelected
                   ? Border.all(
                       color: isDark
-                          ? item.color.withValues(alpha: 0.2)
-                          : AppTheme.primary.withOpacity(0.2),
+                          ? item.color.withValues(alpha: 0.3)
+                          : AppTheme.primary.withValues(alpha: 0.3),
                       width: 1.5,
                     )
                   : null,
               boxShadow: isSelected && !isDark
                   ? [
                       BoxShadow(
-                        color: AppTheme.primary.withOpacity(0.1),
+                        color: AppTheme.primary.withValues(alpha: 0.12),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -336,32 +324,32 @@ class _MainScreenState extends State<MainLayout> {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? (isDark
                               ? item.color.withValues(alpha: 0.2)
-                              : AppTheme.primary.withOpacity(0.1))
+                              : AppTheme.primary.withValues(alpha: 0.12))
                         : (isDark
                               ? Colors.transparent
-                              : Colors.white.withOpacity(0.5)),
-                    borderRadius: BorderRadius.circular(8),
+                              : AppTheme.surface.withValues(alpha: 0.6)),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
                     item.icon,
                     color: isSelected
                         ? (isDark ? item.color : AppTheme.primary)
-                        : (isDark ? Colors.grey[600] : AppTheme.textSecondary),
+                        : (isDark ? Colors.grey[400] : AppTheme.textSecondary),
                     size: 20,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
                 Text(
                   item.title,
                   style: TextStyle(
                     color: isSelected
                         ? (isDark ? AppTheme.textOnDark : AppTheme.primary)
-                        : (isDark ? Colors.grey[600] : AppTheme.textSecondary),
+                        : (isDark ? Colors.grey[300] : AppTheme.textPrimary),
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     fontSize: 15,
                   ),
@@ -377,8 +365,8 @@ class _MainScreenState extends State<MainLayout> {
                       boxShadow: [
                         BoxShadow(
                           color: (isDark ? item.color : AppTheme.primary)
-                              .withOpacity(0.5),
-                          blurRadius: 4,
+                              .withValues(alpha: 0.6),
+                          blurRadius: 6,
                           spreadRadius: 1,
                         ),
                       ],
@@ -399,18 +387,21 @@ class _MainScreenState extends State<MainLayout> {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
+        color: isDark
+            ? const Color(0xFF2A2A2A)
+            : AppTheme.surface.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
-              ? Colors.grey.withOpacity(0.2)
-              : AppTheme.navBorder.withOpacity(0.3),
+              ? Colors.grey.withValues(alpha: 0.2)
+              : AppTheme.navBorder.withValues(alpha: 0.5),
+          width: 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.2)
-                : AppTheme.primary.withOpacity(0.08),
+                ? Colors.black.withValues(alpha: 0.2)
+                : AppTheme.primary.withValues(alpha: 0.06),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -422,11 +413,12 @@ class _MainScreenState extends State<MainLayout> {
             padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
               gradient: isDark ? null : AppTheme.primaryGradient,
+              color: isDark ? Colors.grey[700] : null,
               borderRadius: BorderRadius.circular(22),
             ),
             child: CircleAvatar(
               radius: 20,
-              backgroundColor: isDark ? Colors.grey[700] : Colors.white,
+              backgroundColor: Colors.white,
               child: Icon(
                 Icons.person,
                 color: isDark ? Colors.grey[400] : AppTheme.primary,
@@ -449,7 +441,7 @@ class _MainScreenState extends State<MainLayout> {
                 Text(
                   'Tesoureiro',
                   style: TextStyle(
-                    color: isDark ? Colors.grey : AppTheme.textSecondary,
+                    color: isDark ? Colors.grey[400] : AppTheme.textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -459,7 +451,7 @@ class _MainScreenState extends State<MainLayout> {
           ),
           Icon(
             Icons.more_vert,
-            color: isDark ? Colors.grey[600] : AppTheme.textSecondary,
+            color: isDark ? Colors.grey[500] : AppTheme.textSecondary,
             size: 16,
           ),
         ],
@@ -471,32 +463,37 @@ class _MainScreenState extends State<MainLayout> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      height: 70,
+      height: 80,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+        //color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
         border: Border(
           bottom: BorderSide(
             color: isDark
-                ? Colors.grey.withOpacity(0.2)
-                : AppTheme.navBorder.withOpacity(0.2),
+                ? Colors.grey.withValues(alpha: 0.2)
+                : AppTheme.navBorder.withValues(alpha: 0.2),
           ),
         ),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.1)
-                : AppTheme.primary.withOpacity(0.05),
+                ? Colors.black.withValues(alpha: 0.1)
+                : AppTheme.primary.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
+              Image.asset(
+                'assets/images/logo.png',
+                height: 120, // Reduzido para melhor proporção
+                width: 120,
+              ),
               if (showMenuButton) ...[
                 IconButton(
                   icon: Icon(
@@ -526,7 +523,7 @@ class _MainScreenState extends State<MainLayout> {
           decoration: BoxDecoration(
             color: isDark
                 ? _currentItem.color.withValues(alpha: 0.2)
-                : AppTheme.primary.withOpacity(0.1),
+                : AppTheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
@@ -549,13 +546,7 @@ class _MainScreenState extends State<MainLayout> {
   }
 
   Widget _buildAppBarActions() {
-    return Row(
-      children: [
-        _buildCompanyInfo(),
-        const SizedBox(width: 16),
-        ..._buildActionButtons(),
-      ],
-    );
+    return Row(children: [..._buildActionButtons()]);
   }
 
   Widget _buildCompanyInfo() {
@@ -563,7 +554,7 @@ class _MainScreenState extends State<MainLayout> {
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           'Harmonia, Luz e Sigilo nº 46',
@@ -604,7 +595,7 @@ class _MainScreenState extends State<MainLayout> {
         border: Border.all(
           color: isDark
               ? Colors.transparent
-              : AppTheme.navBorder.withOpacity(0.3),
+              : AppTheme.navBorder.withValues(alpha: 0.3),
         ),
       ),
       child: IconButton(
@@ -628,7 +619,7 @@ class _MainScreenState extends State<MainLayout> {
             border: Border.all(
               color: isDark
                   ? Colors.transparent
-                  : AppTheme.navBorder.withOpacity(0.3),
+                  : AppTheme.navBorder.withValues(alpha: 0.3),
             ),
           ),
           child: IconButton(
@@ -649,7 +640,7 @@ class _MainScreenState extends State<MainLayout> {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.error.withOpacity(0.5),
+                  color: AppTheme.error.withValues(alpha: 0.5),
                   blurRadius: 4,
                   spreadRadius: 1,
                 ),
