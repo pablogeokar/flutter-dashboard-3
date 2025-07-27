@@ -49,6 +49,19 @@ class DataTableCustomTheme {
     ),
     dataTextStyle: TextStyle(color: Colors.white, fontSize: 14),
   );
+
+  static const DataTableCustomTheme defaultLight = DataTableCustomTheme(
+    backgroundColor: Color(0xFFFFFFFF),
+    headerBackgroundColor: Color(0xFFF8FAFC),
+    borderColor: Color(0xFFE2E8F0),
+    hoverColor: Color(0xFFF1F5F9),
+    headerTextStyle: TextStyle(
+      fontWeight: FontWeight.bold,
+      color: Color(0xFF1F2937),
+      fontSize: 14,
+    ),
+    dataTextStyle: TextStyle(color: Color(0xFF1F2937), fontSize: 14),
+  );
 }
 
 /// Widget de tabela personalizada e responsiva
@@ -82,7 +95,7 @@ class DataTableCustom extends StatefulWidget {
     this.emptyMessage,
     this.totalLabel,
     this.leadingIcon,
-    this.theme = DataTableCustomTheme.defaultDark,
+    DataTableCustomTheme? theme,
     this.columnSpacing = 16.0,
     this.horizontalMargin = 12.0,
     this.headingRowHeight = 56.0,
@@ -92,7 +105,7 @@ class DataTableCustom extends StatefulWidget {
     this.itemsPerPageOptions = const [5, 10, 20, 50],
     this.enableHorizontalScroll = true,
     this.maxWidth,
-  });
+  }) : theme = theme ?? DataTableCustomTheme.defaultDark;
 
   @override
   State<DataTableCustom> createState() => _DataTableCustomState();
@@ -216,6 +229,8 @@ class _DataTableCustomState extends State<DataTableCustom> {
 
   /// Estado vazio da tabela
   Widget _buildEmptyState() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Expanded(
       child: Center(
         child: Padding(
@@ -230,7 +245,7 @@ class _DataTableCustomState extends State<DataTableCustom> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey[300],
+                  color: isDark ? Colors.grey[300] : Colors.grey[700],
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -240,7 +255,7 @@ class _DataTableCustomState extends State<DataTableCustom> {
                     'Não há informações para exibir no momento.',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[500],
+                  color: isDark ? Colors.grey[500] : Colors.grey[600],
                   height: 1.4,
                 ),
                 textAlign: TextAlign.center,
@@ -254,6 +269,8 @@ class _DataTableCustomState extends State<DataTableCustom> {
 
   /// Ícone do estado vazio
   Widget _buildEmptyStateIcon() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: 80,
       height: 80,
@@ -268,7 +285,7 @@ class _DataTableCustomState extends State<DataTableCustom> {
       child: Icon(
         Icons.table_chart_outlined,
         size: 40,
-        color: Colors.grey[500],
+        color: isDark ? Colors.grey[500] : Colors.grey[600],
       ),
     );
   }
@@ -309,7 +326,7 @@ class _DataTableCustomState extends State<DataTableCustom> {
             }
             return widget.theme.backgroundColor;
           }),
-          dividerThickness: 1,
+          dividerThickness: 0.3,
           headingTextStyle: widget.theme.headerTextStyle,
           dataTextStyle: widget.theme.dataTextStyle,
         ),
@@ -434,12 +451,17 @@ class _DataTableCustomState extends State<DataTableCustom> {
 
   /// Seletor de itens por página
   Widget _buildItemsPerPageSelector() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           'Itens por página:',
-          style: TextStyle(color: Colors.grey[400], fontSize: 14),
+          style: TextStyle(
+            color: isDark ? Colors.grey[400] : Colors.grey[600],
+            fontSize: 14,
+          ),
         ),
         const SizedBox(width: 8),
         Container(
@@ -454,7 +476,11 @@ class _DataTableCustomState extends State<DataTableCustom> {
               value: _itemsPerPage,
               style: widget.theme.dataTextStyle,
               dropdownColor: widget.theme.headerBackgroundColor,
-              icon: Icon(Icons.expand_more, color: Colors.grey[400], size: 18),
+              icon: Icon(
+                Icons.expand_more,
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                size: 18,
+              ),
               items: widget.itemsPerPageOptions.map((value) {
                 return DropdownMenuItem<int>(
                   value: value,
@@ -559,7 +585,13 @@ class _DataTableCustomState extends State<DataTableCustom> {
           icon: Icon(
             icon,
             size: 18,
-            color: isEnabled ? Colors.grey[300] : Colors.grey[600],
+            color: isEnabled
+                ? (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[300]
+                      : Colors.grey[700])
+                : (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[600]
+                      : Colors.grey[400]),
           ),
           padding: EdgeInsets.zero,
         ),

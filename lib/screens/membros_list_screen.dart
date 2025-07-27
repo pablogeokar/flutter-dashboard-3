@@ -108,27 +108,36 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
   }
 
   Future<void> _confirmarExclusao(Membro membro) async {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Color(0xFF424242)),
+          side: BorderSide(color: colorScheme.outline),
         ),
-        title: const Text(
+        title: Text(
           'Confirmar Exclusão',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: colorScheme.onSurface,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: Text(
           'Deseja realmente excluir o membro ${membro.nome}?',
-          style: TextStyle(color: Colors.grey[300], fontSize: 16),
+          style: TextStyle(
+            color: colorScheme.onSurface.withValues(alpha: 0.8),
+            fontSize: 16,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             style: TextButton.styleFrom(
-              foregroundColor: Colors.grey[400],
+              foregroundColor: colorScheme.onSurface.withValues(alpha: 0.6),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
             child: const Text('Cancelar'),
@@ -286,19 +295,33 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
   }
 
   Widget _buildHeader() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1A1A1A), Color(0xFF2A2A2A)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: isDark
+            ? const LinearGradient(
+                colors: [Color(0xFF1A1A1A), Color(0xFF2A2A2A)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : LinearGradient(
+                colors: [
+                  colorScheme.surface,
+                  colorScheme.surfaceContainerHighest,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
         borderRadius: BorderRadius.circular(16),
+        //border: Border.all(color: colorScheme.outline, width: 1),
         border: Border.all(color: const Color(0xFF424242), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
+            color: colorScheme.shadow.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -312,13 +335,13 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
             children: [
               Row(
                 children: [
-                  IconStyled(icone: Icons.people, isLarge: true),
+                  IconStyled(icone: Icons.people),
                   const SizedBox(width: 16),
-                  const Text(
+                  Text(
                     'Gerenciamento de Irmãos',
                     style: TextStyle(
-                      fontSize: 28,
-                      color: Colors.white,
+                      fontSize: 22,
+                      color: colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
                     ),
@@ -378,17 +401,24 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
                     _filtroNome = value;
                     _aplicarFiltros();
                   },
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: colorScheme.onSurface),
                   decoration: InputDecoration(
                     hintText: 'Buscar por nome...',
-                    hintStyle: TextStyle(color: Colors.grey[400]),
-                    prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+                    hintStyle: TextStyle(
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF424242)),
+                      borderSide: BorderSide(color: colorScheme.outline),
+                      //borderSide: const BorderSide(color: Color(0xFF424242)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
+                      //borderSide: BorderSide(color: colorScheme.outline),
                       borderSide: const BorderSide(color: Color(0xFF424242)),
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -399,7 +429,9 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
                       ),
                     ),
                     filled: true,
-                    fillColor: const Color(0xFF2A2A2A),
+                    fillColor: isDark
+                        ? const Color(0xFF2A2A2A)
+                        : colorScheme.surfaceContainerHighest,
                   ),
                 ),
               ),
@@ -407,17 +439,22 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
               Expanded(
                 child: DropdownButtonFormField<String>(
                   value: _filtroStatus,
-                  style: const TextStyle(color: Colors.white),
-                  dropdownColor: const Color(0xFF2A2A2A),
+                  style: TextStyle(color: colorScheme.onSurface),
+                  dropdownColor: isDark
+                      ? const Color(0xFF2A2A2A)
+                      : colorScheme.surface,
                   decoration: InputDecoration(
                     labelText: 'Filtrar por Status',
-                    labelStyle: TextStyle(color: Colors.grey[400]),
+                    labelStyle: TextStyle(
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF424242)),
+                      borderSide: BorderSide(color: colorScheme.outline),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
+                      //borderSide: BorderSide(color: colorScheme.outline),
                       borderSide: const BorderSide(color: Color(0xFF424242)),
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -428,14 +465,16 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
                       ),
                     ),
                     filled: true,
-                    fillColor: const Color(0xFF2A2A2A),
+                    fillColor: isDark
+                        ? const Color(0xFF2A2A2A)
+                        : colorScheme.surfaceContainerHighest,
                   ),
                   items: _statusFilterList.map((status) {
                     return DropdownMenuItem(
                       value: status,
                       child: Text(
                         status == 'todos' ? 'Todos' : status.toUpperCase(),
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: colorScheme.onSurface),
                       ),
                     );
                   }).toList(),
@@ -448,9 +487,11 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
               const SizedBox(width: 16),
               Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
+                  color: isDark
+                      ? const Color(0xFF2A2A2A)
+                      : colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF424242)),
+                  border: Border.all(color: colorScheme.outline),
                 ),
                 child: IconButton(
                   onPressed: _carregarMembros,
@@ -468,8 +509,32 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Criar tema personalizado para a tabela baseado no tema atual
+    final tableTheme = DataTableCustomTheme(
+      backgroundColor: isDark ? const Color(0xFF1A1A1A) : colorScheme.surface,
+      headerBackgroundColor: isDark
+          ? const Color(0xFF2A2A2A)
+          : colorScheme.surfaceContainerHighest,
+      borderColor: isDark ? const Color(0xFF424242) : colorScheme.outline,
+      hoverColor: isDark
+          ? const Color(0xFF2A2A2A)
+          : colorScheme.surfaceContainerHigh,
+      headerTextStyle: TextStyle(
+        fontWeight: FontWeight.bold,
+        color: colorScheme.onSurface,
+        fontSize: 14,
+      ),
+      dataTextStyle: TextStyle(color: colorScheme.onSurface, fontSize: 14),
+    );
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F0F),
+      backgroundColor: isDark
+          ? const Color(0xFF0F0F0F)
+          : colorScheme.surfaceContainerLowest,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -479,9 +544,9 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
             const SizedBox(height: 24),
             Expanded(
               child: _isLoading
-                  ? const Center(
+                  ? Center(
                       child: CircularProgressIndicator(
-                        color: Color(0xFF00BCD4),
+                        color: const Color(0xFF00BCD4),
                         strokeWidth: 3,
                       ),
                     )
@@ -495,6 +560,7 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
                       ),
                       emptyMessage:
                           'Nenhum membro foi encontrado.\nTente ajustar os filtros ou adicionar novos membros.',
+                      theme: tableTheme,
                       // Configurações de paginação
                       enablePagination: true,
                       itemsPerPage: 10,

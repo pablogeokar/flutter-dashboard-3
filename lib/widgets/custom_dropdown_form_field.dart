@@ -23,15 +23,19 @@ class CustomDropdownFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         RichText(
           text: TextSpan(
             text: label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
-              color: Colors.grey[500],
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
             ),
             children: [
               if (isRequired)
@@ -48,26 +52,36 @@ class CustomDropdownFormField extends StatelessWidget {
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
           value: value,
+          style: TextStyle(color: colorScheme.onSurface),
+          dropdownColor: isDark ? Colors.grey[800] : colorScheme.surface,
           items: items.map((String item) {
             return DropdownMenuItem<String>(
               value: item,
-              child: Text(item.toUpperCase()),
+              child: Text(
+                item.toUpperCase(),
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
             );
           }).toList(),
           onChanged: onChanged,
           decoration: InputDecoration(
-            prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+            prefixIcon: prefixIcon != null
+                ? Icon(
+                    prefixIcon,
+                    color: colorScheme.onSurface.withValues(alpha: 0.7),
+                  )
+                : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey[700]!),
+              borderSide: BorderSide(color: colorScheme.outline),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey[700]!),
+              borderSide: BorderSide(color: colorScheme.outline),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.white, width: 2),
+              borderSide: BorderSide(color: colorScheme.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -78,7 +92,9 @@ class CustomDropdownFormField extends StatelessWidget {
               borderSide: const BorderSide(color: Colors.red, width: 2),
             ),
             filled: true,
-            fillColor: Colors.black54,
+            fillColor: isDark
+                ? Colors.black54
+                : colorScheme.surfaceContainerHighest,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 12,

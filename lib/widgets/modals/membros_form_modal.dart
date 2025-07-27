@@ -141,6 +141,10 @@ class _MembrosFormModalState extends State<MembrosFormModal> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(16),
@@ -149,7 +153,7 @@ class _MembrosFormModalState extends State<MembrosFormModal> {
         height: MediaQuery.of(context).size.height * 0.9,
         constraints: const BoxConstraints(maxWidth: 700, maxHeight: 650),
         decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -158,7 +162,23 @@ class _MembrosFormModalState extends State<MembrosFormModal> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                gradient: isDark
+                    ? LinearGradient(
+                        colors: [
+                          theme.primaryColor,
+                          theme.primaryColor.withValues(alpha: 0.8),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : LinearGradient(
+                        colors: [
+                          theme.primaryColor,
+                          theme.primaryColor.withValues(alpha: 0.9),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
@@ -269,10 +289,18 @@ class _MembrosFormModalState extends State<MembrosFormModal> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
+                color: isDark
+                    ? colorScheme.surface
+                    : colorScheme.surfaceContainerHighest,
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(16),
                   bottomRight: Radius.circular(16),
+                ),
+                border: Border(
+                  top: BorderSide(
+                    color: colorScheme.outline.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
                 ),
               ),
               child: Row(

@@ -34,6 +34,10 @@ class CustomTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     List<TextInputFormatter> formatters = inputFormatters ?? [];
 
     if (isUpperCase) {
@@ -50,9 +54,9 @@ class CustomTextFormField extends StatelessWidget {
         RichText(
           text: TextSpan(
             text: label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
-              color: Colors.grey[500],
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
             ),
             children: [
               if (isRequired)
@@ -74,24 +78,32 @@ class CustomTextFormField extends StatelessWidget {
           readOnly: readOnly,
           onTap: onTap,
           inputFormatters: formatters,
+          style: TextStyle(color: colorScheme.onSurface),
           textCapitalization: isUpperCase
               ? TextCapitalization.characters
               : TextCapitalization.none,
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(color: Colors.grey[600]),
-            prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+            hintStyle: TextStyle(
+              color: colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+            prefixIcon: prefixIcon != null
+                ? Icon(
+                    prefixIcon,
+                    color: colorScheme.onSurface.withValues(alpha: 0.7),
+                  )
+                : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey[200]!),
+              borderSide: BorderSide(color: colorScheme.outline),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey[700]!),
+              borderSide: BorderSide(color: colorScheme.outline),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.white, width: 2),
+              borderSide: BorderSide(color: colorScheme.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -102,8 +114,11 @@ class CustomTextFormField extends StatelessWidget {
               borderSide: const BorderSide(color: Colors.red, width: 2),
             ),
             filled: true,
-            //fillColor: readOnly ? Colors.grey[100] : Colors.grey[700],
-            fillColor: Colors.black54,
+            fillColor: readOnly
+                ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+                : (isDark
+                      ? Colors.black54
+                      : colorScheme.surfaceContainerHighest),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 12,
