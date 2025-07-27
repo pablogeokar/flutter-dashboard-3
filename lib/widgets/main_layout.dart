@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dashboard_3/screens/blank_screen.dart';
 import 'package:flutter_dashboard_3/theme.dart';
+import 'package:flutter_dashboard_3/responsive_layout.dart';
 
 // Classe para encapsular dados de navegação
 class NavigationItem {
@@ -27,6 +28,7 @@ class MainLayout extends StatefulWidget {
 class _MainScreenState extends State<MainLayout> {
   int _selectedIndex = 0;
   final String _appVersion = '';
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   // Dados dos itens de navegação centralizados
   static const List<NavigationItem> _navigationItems = [
@@ -72,6 +74,36 @@ class _MainScreenState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
+    return ResponsiveLayout(
+      mobile: _buildMobileLayout(),
+      desktop: _buildDesktopLayout(),
+    );
+  }
+
+  // Layout para mobile com drawer
+  Widget _buildMobileLayout() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: isDark ? const Color(0xFF0F0F0F) : AppTheme.background,
+      drawer: Drawer(width: 280, child: _buildSidebarContent()),
+      body: Column(
+        children: [
+          _buildAppBar(showMenuButton: true),
+          Expanded(
+            child: Container(
+              color: isDark ? const Color(0xFF0F0F0F) : AppTheme.background,
+              child: _currentItem.screen,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Layout para desktop com sidebar fixa
+  Widget _buildDesktopLayout() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -82,7 +114,7 @@ class _MainScreenState extends State<MainLayout> {
           Expanded(
             child: Column(
               children: [
-                _buildAppBar(),
+                _buildAppBar(showMenuButton: false),
                 Expanded(
                   child: Container(
                     color: isDark
@@ -99,6 +131,7 @@ class _MainScreenState extends State<MainLayout> {
     );
   }
 
+  // Sidebar para desktop
   Widget _buildSidebar() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -131,16 +164,21 @@ class _MainScreenState extends State<MainLayout> {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSidebarHeader(),
-          _buildDivider(),
-          const SizedBox(height: 24),
-          _buildNavigationMenu(),
-          _buildUserInfo(),
-        ],
-      ),
+      child: _buildSidebarContent(),
+    );
+  }
+
+  // Conteúdo da sidebar (reutilizado no drawer)
+  Widget _buildSidebarContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSidebarHeader(),
+        _buildDivider(),
+        const SizedBox(height: 24),
+        _buildNavigationMenu(),
+        _buildUserInfo(),
+      ],
     );
   }
 
@@ -260,7 +298,13 @@ class _MainScreenState extends State<MainLayout> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: () => setState(() => _selectedIndex = index),
+          onTap: () {
+            setState(() => _selectedIndex = index);
+            // Fechar drawer no mobile após seleção
+            if (ResponsiveLayout.isMobile(context)) {
+              Navigator.of(context).pop();
+            }
+          },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -423,7 +467,7 @@ class _MainScreenState extends State<MainLayout> {
     );
   }
 
-  Widget _buildAppBar() {
+  Widget _buildAppBar({bool showMenuButton = false}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
@@ -450,7 +494,24 @@ class _MainScreenState extends State<MainLayout> {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [_buildAppBarTitle(), _buildAppBarActions()],
+        children: [
+          Row(
+            children: [
+              if (showMenuButton) ...[
+                IconButton(
+                  icon: Icon(
+                    Icons.menu,
+                    color: isDark ? AppTheme.textOnDark : AppTheme.primary,
+                  ),
+                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                ),
+                const SizedBox(width: 8),
+              ],
+              _buildAppBarTitle(),
+            ],
+          ),
+          _buildAppBarActions(),
+        ],
       ),
     );
   }
