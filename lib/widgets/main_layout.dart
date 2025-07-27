@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dashboard_3/screens/blank_screen.dart';
+import 'package:flutter_dashboard_3/screens/membros_list_screen.dart';
 import 'package:flutter_dashboard_3/theme.dart';
 import 'package:flutter_dashboard_3/responsive_layout.dart';
 import 'package:flutter_dashboard_3/widgets/layout/sidebar/navigation_item_model.dart';
@@ -25,7 +26,7 @@ class _MainLayoutState extends State<MainLayout> {
       color: Colors.blue,
     ),
     NavigationItem(
-      screen: BlankScreen(title: 'Membros'),
+      screen: MembrosListScreen(),
       title: 'Membros',
       icon: Icons.people_alt,
       color: Color(0xFF00BCD4),
