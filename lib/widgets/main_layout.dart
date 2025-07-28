@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dashboard_3/screens/blank_screen.dart';
+import 'package:flutter_dashboard_3/screens/configuracoes_screen.dart';
 import 'package:flutter_dashboard_3/screens/contribuicoes_screen.dart';
 import 'package:flutter_dashboard_3/screens/membros_list_screen.dart';
 import 'package:flutter_dashboard_3/theme.dart';
@@ -45,7 +46,7 @@ class _MainLayoutState extends State<MainLayout> {
       color: Colors.amber,
     ),
     NavigationItem(
-      screen: BlankScreen(title: 'Configurações'),
+      screen: ConfiguracoesScreen(),
       title: 'Configurações',
       icon: Icons.settings,
       color: Colors.grey,

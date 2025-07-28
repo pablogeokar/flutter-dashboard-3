@@ -62,8 +62,14 @@ class DatabaseMigrations {
       },
       {
         'chave': 'nome_loja',
-        'valor': 'Harmonia, Luz e Sigilo nº 46',
+        'valor': 'Harmonia, Luz e Sigilo',
         'descricao': 'Nome da loja',
+        'data_atualizacao': DateTime.now().millisecondsSinceEpoch,
+      },
+      {
+        'chave': 'cnpj',
+        'valor': '13.613.963/0001-02',
+        'descricao': 'CNPJ',
         'data_atualizacao': DateTime.now().millisecondsSinceEpoch,
       },
     ];
