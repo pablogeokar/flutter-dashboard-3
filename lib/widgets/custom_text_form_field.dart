@@ -79,45 +79,46 @@ class CustomTextFormField extends StatelessWidget {
           onTap: onTap,
           inputFormatters: formatters,
           style: TextStyle(color: colorScheme.onSurface),
+          cursorColor: const Color(0xFF00BCD4),
           textCapitalization: isUpperCase
               ? TextCapitalization.characters
               : TextCapitalization.none,
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: TextStyle(
-              color: colorScheme.onSurface.withValues(alpha: 0.6),
+              color: colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             prefixIcon: prefixIcon != null
                 ? Icon(
                     prefixIcon,
-                    color: colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: colorScheme.onSurface.withValues(alpha: 0.4),
                   )
                 : null,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: colorScheme.outline),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colorScheme.outline),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF424242)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colorScheme.primary, width: 2),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF00BCD4), width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.red, width: 2),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.red, width: 2),
             ),
             filled: true,
             fillColor: readOnly
                 ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
                 : (isDark
-                      ? Colors.black54
+                      ? const Color(0xFF2A2A2A)
                       : colorScheme.surfaceContainerHighest),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,

@@ -27,91 +27,69 @@ class CustomDropdownFormField extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        RichText(
-          text: TextSpan(
-            text: label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-              color: colorScheme.onSurface.withValues(alpha: 0.7),
-            ),
-            children: [
-              if (isRequired)
-                const TextSpan(
-                  text: ' *',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-            ],
+    return Container(
+      margin: const EdgeInsets.only(top: 4),
+      child: DropdownButtonFormField<String>(
+        value: value,
+        style: TextStyle(color: colorScheme.onSurface),
+        dropdownColor: isDark ? const Color(0xFF2A2A2A) : colorScheme.surface,
+        decoration: InputDecoration(
+          labelText: isRequired ? '$label *' : label,
+          labelStyle: TextStyle(
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
           ),
+          prefixIcon: prefixIcon != null
+              ? Icon(
+                  prefixIcon,
+                  color: colorScheme.onSurface.withValues(alpha: 0.4),
+                )
+              : null,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: colorScheme.outline),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFF424242)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFF00BCD4), width: 2),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.red, width: 2),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.red, width: 2),
+          ),
+          filled: true,
+          fillColor: isDark
+              ? const Color(0xFF2A2A2A)
+              : colorScheme.surfaceContainerHighest,
         ),
-        const SizedBox(height: 6),
-        DropdownButtonFormField<String>(
-          value: value,
-          style: TextStyle(color: colorScheme.onSurface),
-          dropdownColor: isDark ? Colors.grey[800] : colorScheme.surface,
-          items: items.map((String item) {
-            return DropdownMenuItem<String>(
-              value: item,
-              child: Text(
-                item.toUpperCase(),
-                style: TextStyle(color: colorScheme.onSurface),
-              ),
-            );
-          }).toList(),
-          onChanged: onChanged,
-          decoration: InputDecoration(
-            prefixIcon: prefixIcon != null
-                ? Icon(
-                    prefixIcon,
-                    color: colorScheme.onSurface.withValues(alpha: 0.7),
-                  )
-                : null,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colorScheme.outline),
+        items: items.map((String item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Text(
+              item.toUpperCase(),
+              style: TextStyle(color: colorScheme.onSurface),
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colorScheme.outline),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colorScheme.primary, width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.red, width: 2),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.red, width: 2),
-            ),
-            filled: true,
-            fillColor: isDark
-                ? Colors.black54
-                : colorScheme.surfaceContainerHighest,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
-          ),
-          validator:
-              validator ??
-              (isRequired
-                  ? (value) {
-                      if (value == null || value.isEmpty) {
-                        return '$label é obrigatório';
-                      }
-                      return null;
+          );
+        }).toList(),
+        onChanged: onChanged,
+        validator:
+            validator ??
+            (isRequired
+                ? (value) {
+                    if (value == null || value.isEmpty) {
+                      return '$label é obrigatório';
                     }
-                  : null),
-        ),
-      ],
+                    return null;
+                  }
+                : null),
+      ),
     );
   }
 }
