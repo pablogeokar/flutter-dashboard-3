@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dashboard_3/screens/blank_screen.dart';
+import 'package:flutter_dashboard_3/screens/contribuicoes_screen.dart';
 import 'package:flutter_dashboard_3/screens/membros_list_screen.dart';
 import 'package:flutter_dashboard_3/theme.dart';
 import 'package:flutter_dashboard_3/responsive_layout.dart';
@@ -32,7 +33,7 @@ class _MainLayoutState extends State<MainLayout> {
       color: Color(0xFF00BCD4),
     ),
     NavigationItem(
-      screen: BlankScreen(title: 'Contribuições'),
+      screen: ContribuicoesScreen(),
       title: 'Contribuições',
       icon: Icons.payments,
       color: Colors.lightGreen,
