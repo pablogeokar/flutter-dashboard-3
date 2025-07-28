@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dashboard_3/services/database_service.dart';
 import 'package:flutter_dashboard_3/models/contribuicao.dart';
+import 'package:flutter_dashboard_3/widgets/custom_dropdown_form_field.dart';
 import 'package:flutter_dashboard_3/widgets/modals/contribuicao_form_modal.dart';
 import 'package:flutter_dashboard_3/widgets/card_financeiro.dart';
 
@@ -356,55 +357,45 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
       child: Column(
         children: [
           // Seletor de período
+          // No método _buildHeaderSection(), substitua os DropdownButtonFormField existentes por:
           Row(
             children: [
               Expanded(
-                child: DropdownButtonFormField<int>(
-                  value: _mesReferencia,
-                  decoration: const InputDecoration(
-                    labelText: 'Mês',
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                  ),
-                  items: List.generate(12, (index) {
-                    final mes = index + 1;
-                    return DropdownMenuItem(
-                      value: mes,
-                      child: Text(_meses[mes]),
-                    );
-                  }),
+                child: CustomDropdownFormField(
+                  value: _meses[_mesReferencia],
+                  label: 'Mês',
+                  items: _meses.sublist(1), // Remove o item vazio do início
                   onChanged: (valor) {
-                    setState(() => _mesReferencia = valor!);
-                    _carregarDados();
+                    if (valor != null) {
+                      final novoMes = _meses.indexOf(valor);
+                      if (novoMes != _mesReferencia) {
+                        setState(() => _mesReferencia = novoMes);
+                        _carregarDados();
+                      }
+                    }
                   },
+                  prefixIcon: Icons.calendar_today,
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: DropdownButtonFormField<int>(
-                  value: _anoReferencia,
-                  decoration: const InputDecoration(
-                    labelText: 'Ano',
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                  ),
+                child: CustomDropdownFormField(
+                  value: _anoReferencia.toString(),
+                  label: 'Ano',
                   items: List.generate(10, (index) {
                     final ano = DateTime.now().year - 5 + index;
-                    return DropdownMenuItem(
-                      value: ano,
-                      child: Text(ano.toString()),
-                    );
+                    return ano.toString();
                   }),
                   onChanged: (valor) {
-                    setState(() => _anoReferencia = valor!);
-                    _carregarDados();
+                    if (valor != null) {
+                      final novoAno = int.parse(valor);
+                      if (novoAno != _anoReferencia) {
+                        setState(() => _anoReferencia = novoAno);
+                        _carregarDados();
+                      }
+                    }
                   },
+                  prefixIcon: Icons.calendar_view_month,
                 ),
               ),
             ],

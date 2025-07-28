@@ -108,3 +108,89 @@ class CardFinanceiro extends StatelessWidget {
     );
   }
 }
+
+// import 'package:flutter/material.dart';
+
+// class CardFinanceiro extends StatelessWidget {
+//   final String titulo;
+//   final String valor;
+//   final IconData icone;
+//   final Color cor;
+//   final bool multiLinha;
+
+//   const CardFinanceiro({
+//     super.key,
+//     required this.titulo,
+//     required this.valor,
+//     required this.icone,
+//     required this.cor,
+//     this.multiLinha = true,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final theme = Theme.of(context);
+//     final isDark = theme.brightness == Brightness.dark;
+
+//     return Card(
+//       elevation: 2,
+//       color: isDark ? const Color(0xFF2A2A2A) : theme.colorScheme.surface,
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.circular(12),
+//         side: BorderSide(
+//           color: isDark ? const Color(0xFF424242) : theme.colorScheme.outline,
+//           width: 1,
+//         ),
+//       ),
+//       child: Padding(
+//         padding: const EdgeInsets.all(16),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 Text(
+//                   titulo,
+//                   style: theme.textTheme.titleSmall?.copyWith(
+//                     color: theme.colorScheme.onSurface.withOpacity(0.7),
+//                   ),
+//                 ),
+//                 Container(
+//                   padding: const EdgeInsets.all(8),
+//                   decoration: BoxDecoration(
+//                     color: cor.withOpacity(0.2),
+//                     shape: BoxShape.circle,
+//                   ),
+//                   child: Icon(icone, color: cor, size: 20),
+//                 ),
+//               ],
+//             ),
+//             const SizedBox(height: 8),
+//             if (multiLinha && valor.contains('\n'))
+//               Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: valor.split('\n').map((linha) {
+//                   return Text(
+//                     linha,
+//                     style: theme.textTheme.titleMedium?.copyWith(
+//                       fontWeight: FontWeight.bold,
+//                       color: theme.colorScheme.onSurface,
+//                     ),
+//                   );
+//                 }).toList(),
+//               )
+//             else
+//               Text(
+//                 valor,
+//                 style: theme.textTheme.titleMedium?.copyWith(
+//                   fontWeight: FontWeight.bold,
+//                   color: theme.colorScheme.onSurface,
+//                 ),
+//               ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
