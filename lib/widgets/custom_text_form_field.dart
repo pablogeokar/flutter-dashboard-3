@@ -48,97 +48,74 @@ class CustomTextFormField extends StatelessWidget {
       );
     }
 
-    Widget child = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        RichText(
-          text: TextSpan(
-            text: label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-              color: colorScheme.onSurface.withValues(alpha: 0.7),
-            ),
-            children: [
-              if (isRequired)
-                const TextSpan(
-                  text: ' *',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-            ],
-          ),
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      readOnly: readOnly,
+      onTap: onTap,
+      inputFormatters: formatters,
+      style: TextStyle(color: colorScheme.onSurface),
+      cursorColor: const Color(0xFF00BCD4),
+      textCapitalization: isUpperCase
+          ? TextCapitalization.characters
+          : TextCapitalization.none,
+      decoration: InputDecoration(
+        labelText: isRequired ? '$label *' : label,
+        labelStyle: TextStyle(
+          color: colorScheme.onSurface.withValues(alpha: 0.6),
         ),
-        const SizedBox(height: 6),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          readOnly: readOnly,
-          onTap: onTap,
-          inputFormatters: formatters,
-          style: TextStyle(color: colorScheme.onSurface),
-          cursorColor: const Color(0xFF00BCD4),
-          textCapitalization: isUpperCase
-              ? TextCapitalization.characters
-              : TextCapitalization.none,
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: TextStyle(
-              color: colorScheme.onSurface.withValues(alpha: 0.5),
-            ),
-            prefixIcon: prefixIcon != null
-                ? Icon(
-                    prefixIcon,
-                    color: colorScheme.onSurface.withValues(alpha: 0.4),
-                  )
-                : null,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: colorScheme.outline),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF424242)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF00BCD4), width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.red, width: 2),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.red, width: 2),
-            ),
-            filled: true,
-            fillColor: readOnly
-                ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-                : (isDark
-                      ? const Color(0xFF2A2A2A)
-                      : colorScheme.surfaceContainerHighest),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
-          ),
-          validator:
-              validator ??
-              (isRequired
-                  ? (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return '$label é obrigatório';
-                      }
-                      return null;
-                    }
-                  : null),
+        hintText: hintText,
+        hintStyle: TextStyle(
+          color: colorScheme.onSurface.withValues(alpha: 0.6),
         ),
-      ],
+        prefixIcon: prefixIcon != null
+            ? Icon(
+                prefixIcon,
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
+              )
+            : null,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: colorScheme.outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF424242)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF00BCD4), width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        filled: true,
+        fillColor: readOnly
+            ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+            : (isDark
+                  ? const Color(0xFF2A2A2A)
+                  : colorScheme.surfaceContainerHighest),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+      ),
+      validator:
+          validator ??
+          (isRequired
+              ? (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return '$label é obrigatório';
+                  }
+                  return null;
+                }
+              : null),
     );
-
-    return child;
   }
 }

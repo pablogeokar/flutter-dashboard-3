@@ -227,7 +227,7 @@ class _MembrosFormModalState extends State<MembrosFormModal> {
                           isRequired: true,
                           isUpperCase: true,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 24),
                         Row(
                           children: [
                             Expanded(
@@ -249,7 +249,7 @@ class _MembrosFormModalState extends State<MembrosFormModal> {
                                 },
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: 24),
                             Expanded(
                               child: CustomTextFormField(
                                 controller: _telefoneController,
@@ -260,7 +260,7 @@ class _MembrosFormModalState extends State<MembrosFormModal> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 24),
                         CustomDropdownFormField(
                           value: _statusSelecionado,
                           label: 'Status',
@@ -270,7 +270,7 @@ class _MembrosFormModalState extends State<MembrosFormModal> {
                           onChanged: (value) =>
                               setState(() => _statusSelecionado = value!),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 24),
                         CustomTextFormField(
                           controller: _observacoesController,
                           label: 'Observações',

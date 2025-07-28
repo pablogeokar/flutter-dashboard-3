@@ -5,6 +5,8 @@ import 'package:flutter_dashboard_3/widgets/icon_styled.dart';
 import '../widgets/modals/membros_form_modal.dart';
 import '../widgets/modals/excel_import_modal.dart';
 import '../widgets/data_table_custom.dart';
+import '../widgets/custom_text_form_field.dart';
+import '../widgets/custom_dropdown_form_field.dart';
 
 class MembrosListScreen extends StatefulWidget {
   const MembrosListScreen({super.key});
@@ -20,6 +22,9 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
   bool _isLoading = true;
   String _filtroStatus = 'todos';
   String _filtroNome = '';
+
+  // Controladores para os campos customizados
+  final TextEditingController _nomeController = TextEditingController();
 
   final List<String> _statusFilterList = [
     'todos',
@@ -57,6 +62,18 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
   void initState() {
     super.initState();
     _carregarMembros();
+
+    // Listener para o campo de busca
+    _nomeController.addListener(() {
+      _filtroNome = _nomeController.text;
+      _aplicarFiltros();
+    });
+  }
+
+  @override
+  void dispose() {
+    _nomeController.dispose();
+    super.dispose();
   }
 
   Future<void> _carregarMembros() async {
@@ -393,91 +410,23 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
           ),
           const SizedBox(height: 24),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 flex: 2,
-                child: TextField(
-                  onChanged: (value) {
-                    _filtroNome = value;
-                    _aplicarFiltros();
-                  },
-                  style: TextStyle(color: colorScheme.onSurface),
-                  decoration: InputDecoration(
-                    hintText: 'Buscar por nome...',
-                    hintStyle: TextStyle(
-                      color: colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: colorScheme.outline),
-                      //borderSide: const BorderSide(color: Color(0xFF424242)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      //borderSide: BorderSide(color: colorScheme.outline),
-                      borderSide: const BorderSide(color: Color(0xFF424242)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFF00BCD4),
-                        width: 2,
-                      ),
-                    ),
-                    filled: true,
-                    fillColor: isDark
-                        ? const Color(0xFF2A2A2A)
-                        : colorScheme.surfaceContainerHighest,
-                  ),
+                child: CustomTextFormField(
+                  controller: _nomeController,
+                  label: 'Buscar por nome',
+                  hintText: 'Buscar por nome...',
+                  prefixIcon: Icons.search,
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: DropdownButtonFormField<String>(
+                child: CustomDropdownFormField(
                   value: _filtroStatus,
-                  style: TextStyle(color: colorScheme.onSurface),
-                  dropdownColor: isDark
-                      ? const Color(0xFF2A2A2A)
-                      : colorScheme.surface,
-                  decoration: InputDecoration(
-                    labelText: 'Filtrar por Status',
-                    labelStyle: TextStyle(
-                      color: colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: colorScheme.outline),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      //borderSide: BorderSide(color: colorScheme.outline),
-                      borderSide: const BorderSide(color: Color(0xFF424242)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFF00BCD4),
-                        width: 2,
-                      ),
-                    ),
-                    filled: true,
-                    fillColor: isDark
-                        ? const Color(0xFF2A2A2A)
-                        : colorScheme.surfaceContainerHighest,
-                  ),
-                  items: _statusFilterList.map((status) {
-                    return DropdownMenuItem(
-                      value: status,
-                      child: Text(
-                        status == 'todos' ? 'Todos' : status.toUpperCase(),
-                        style: TextStyle(color: colorScheme.onSurface),
-                      ),
-                    );
-                  }).toList(),
+                  label: 'Filtrar por Status',
+                  items: _statusFilterList,
                   onChanged: (value) {
                     setState(() => _filtroStatus = value!);
                     _aplicarFiltros();
