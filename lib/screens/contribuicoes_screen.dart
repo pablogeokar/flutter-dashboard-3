@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dashboard_3/services/database_service.dart';
 import 'package:flutter_dashboard_3/models/contribuicao.dart';
 import 'package:flutter_dashboard_3/widgets/modals/contribuicao_form_modal.dart';
+import 'package:flutter_dashboard_3/widgets/card_financeiro.dart';
 
 class ContribuicoesScreen extends StatefulWidget {
   const ContribuicoesScreen({super.key});
@@ -424,63 +425,35 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
     return Row(
       children: [
         Expanded(
-          child: _buildEstatisticaCard(
-            'Total',
-            '${totalGeral['quantidade'] ?? 0}',
-            'R\$ ${(totalGeral['valor_total'] ?? 0.0).toStringAsFixed(2)}',
-            Colors.blue,
+          child: CardFinanceiro(
+            titulo: 'Total',
+            valor:
+                '${totalGeral['quantidade'] ?? 0}\nR\$ ${(totalGeral['valor_total'] ?? 0.0).toStringAsFixed(2)}',
+            icone: Icons.monetization_on,
+            cor: Colors.blue,
           ),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _buildEstatisticaCard(
-            'Pagas',
-            '${porStatus['pago']?['quantidade'] ?? 0}',
-            'R\$ ${(porStatus['pago']?['valor_total'] ?? 0.0).toStringAsFixed(2)}',
-            Colors.green,
+          child: CardFinanceiro(
+            titulo: 'Pagas',
+            valor:
+                '${porStatus['pago']?['quantidade'] ?? 0}\nR\$ ${(porStatus['pago']?['valor_total'] ?? 0.0).toStringAsFixed(2)}',
+            icone: Icons.check_circle,
+            cor: Colors.green,
           ),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _buildEstatisticaCard(
-            'Pendentes',
-            '${porStatus['pendente']?['quantidade'] ?? 0}',
-            'R\$ ${(porStatus['pendente']?['valor_total'] ?? 0.0).toStringAsFixed(2)}',
-            Colors.orange,
+          child: CardFinanceiro(
+            titulo: 'Pendentes',
+            valor:
+                '${porStatus['pendente']?['quantidade'] ?? 0}\nR\$ ${(porStatus['pendente']?['valor_total'] ?? 0.0).toStringAsFixed(2)}',
+            icone: Icons.schedule,
+            cor: Colors.orange,
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildEstatisticaCard(
-    String titulo,
-    String quantidade,
-    String valor,
-    Color cor,
-  ) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            Text(
-              titulo,
-              style: TextStyle(
-                fontSize: 12,
-                color: cor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              quantidade,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Text(valor, style: const TextStyle(fontSize: 12)),
-          ],
-        ),
-      ),
     );
   }
 
