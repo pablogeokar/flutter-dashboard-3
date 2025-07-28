@@ -93,7 +93,7 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
         anoReferencia: _anoReferencia,
       );
 
-      Navigator.pop(context); // Fechar diálogo de carregamento
+      if (mounted) Navigator.pop(context); // Fechar diálogo de carregamento
 
       if (resultado['sucesso']) {
         _mostrarMensagem(
@@ -108,7 +108,7 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
         _mostrarMensagem(resultado['mensagem'], Colors.orange);
       }
     } catch (e) {
-      Navigator.pop(context); // Fechar diálogo de carregamento
+      if (mounted) Navigator.pop(context); // Fechar diálogo de carregamento
       _mostrarMensagem('Erro ao gerar contribuições: $e', Colors.red);
     }
   }
