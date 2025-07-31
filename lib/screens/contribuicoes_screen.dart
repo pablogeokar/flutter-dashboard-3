@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dashboard_3/screens/pdf_preview_screen.dart';
 import 'package:flutter_dashboard_3/services/database_service.dart';
 import 'package:flutter_dashboard_3/models/contribuicao.dart';
+import 'package:flutter_dashboard_3/services/pdf_service.dart';
 import 'package:flutter_dashboard_3/widgets/custom_dropdown_form_field.dart';
 import 'package:flutter_dashboard_3/widgets/modals/contribuicao_form_modal.dart';
 import 'package:flutter_dashboard_3/widgets/card_financeiro.dart';
@@ -495,6 +497,109 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
     );
   }
 
+  //   Widget _buildContribuicaoCard(Contribuicao contribuicao) {
+  //     return Card(
+  //       margin: const EdgeInsets.only(bottom: 8),
+  //       child: ListTile(
+  //         leading: CircleAvatar(
+  //           backgroundColor: _getStatusColor(contribuicao.status),
+  //           child: Icon(
+  //             contribuicao.isPago
+  //                 ? Icons.check
+  //                 : contribuicao.isCancelado
+  //                 ? Icons.close
+  //                 : Icons.schedule,
+  //             color: Colors.white,
+  //           ),
+  //         ),
+  //         title: Text(
+  //           contribuicao.membroNome ?? 'Membro não encontrado',
+  //           style: const TextStyle(fontWeight: FontWeight.bold),
+  //         ),
+  //         subtitle: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             Text('R\$ ${contribuicao.valor.toStringAsFixed(2)}'),
+  //             Text(
+  //               _getStatusText(contribuicao.status),
+  //               style: TextStyle(
+  //                 color: _getStatusColor(contribuicao.status),
+  //                 fontWeight: FontWeight.w500,
+  //               ),
+  //             ),
+  //             if (contribuicao.dataPagamento != null)
+  //               Text(
+  //                 'Pago em: ${contribuicao.dataPagamento!.day.toString().padLeft(2, '0')}/'
+  //                 '${contribuicao.dataPagamento!.month.toString().padLeft(2, '0')}/'
+  //                 '${contribuicao.dataPagamento!.year}',
+  //                 style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+  //               ),
+  //             if (contribuicao.observacoes != null &&
+  //                 contribuicao.observacoes!.isNotEmpty)
+  //               Text(
+  //                 'Obs: ${contribuicao.observacoes}',
+  //                 style: TextStyle(
+  //                   fontSize: 12,
+  //                   color: Colors.grey[600],
+  //                   fontStyle: FontStyle.italic,
+  //                 ),
+  //               ),
+  //           ],
+  //         ),
+  //         trailing: PopupMenuButton<String>(
+  //           onSelected: (valor) {
+  //             switch (valor) {
+  //               case 'editar':
+  //                 _editarContribuicao(contribuicao);
+  //                 break;
+  //               case 'pagar':
+  //                 _marcarComoPago(contribuicao);
+  //                 break;
+  //               case 'cancelar':
+  //                 _cancelarContribuicao(contribuicao);
+  //                 break;
+  //             }
+  //           },
+  //           itemBuilder: (context) => [
+  //             const PopupMenuItem(
+  //               value: 'editar',
+  //               child: Row(
+  //                 children: [
+  //                   Icon(Icons.edit, color: Colors.blue),
+  //                   SizedBox(width: 8),
+  //                   Text('Editar'),
+  //                 ],
+  //               ),
+  //             ),
+  //             if (contribuicao.isPendente) ...[
+  //               const PopupMenuItem(
+  //                 value: 'pagar',
+  //                 child: Row(
+  //                   children: [
+  //                     Icon(Icons.check, color: Colors.green),
+  //                     SizedBox(width: 8),
+  //                     Text('Marcar como Pago'),
+  //                   ],
+  //                 ),
+  //               ),
+  //               const PopupMenuItem(
+  //                 value: 'cancelar',
+  //                 child: Row(
+  //                   children: [
+  //                     Icon(Icons.close, color: Colors.red),
+  //                     SizedBox(width: 8),
+  //                     Text('Cancelar'),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ],
+  //           ],
+  //         ),
+  //       ),
+  //     );
+  //   }
+  // }
+
   Widget _buildContribuicaoCard(Contribuicao contribuicao) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -556,6 +661,12 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
               case 'cancelar':
                 _cancelarContribuicao(contribuicao);
                 break;
+              case 'visualizar': // Nova opção
+                _visualizarRecibo(contribuicao);
+                break;
+              case 'imprimir': // Opção de impressão direta
+                _imprimirRecibo(contribuicao);
+                break;
             }
           },
           itemBuilder: (context) => [
@@ -569,6 +680,28 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
                 ],
               ),
             ),
+            if (contribuicao.isPago) ...[
+              const PopupMenuItem(
+                value: 'visualizar',
+                child: Row(
+                  children: [
+                    Icon(Icons.preview, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text('Visualizar Recibo'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'imprimir',
+                child: Row(
+                  children: [
+                    Icon(Icons.print, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text('Imprimir Recibo'),
+                  ],
+                ),
+              ),
+            ],
             if (contribuicao.isPendente) ...[
               const PopupMenuItem(
                 value: 'pagar',
@@ -595,5 +728,43 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _visualizarRecibo(Contribuicao contribuicao) async {
+    try {
+      _mostrarDialogoCarregamento('Gerando pré-visualização...');
+      final pdfFile = await PdfService.generateContributionReceipt(
+        contribuicao,
+      );
+      final pdfBytes = await pdfFile.readAsBytes();
+
+      if (mounted) {
+        Navigator.pop(context); // Fecha o diálogo de carregamento
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PdfPreviewScreen(pdfBytes: pdfBytes),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Fecha o diálogo de carregamento
+        _mostrarMensagem('Erro ao gerar recibo: $e', Colors.red);
+      }
+    }
+  }
+
+  Future<void> _imprimirRecibo(Contribuicao contribuicao) async {
+    try {
+      _mostrarDialogoCarregamento('Preparando impressão...');
+      await PdfService.printReceipt(contribuicao);
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context);
+        _mostrarMensagem('Erro ao imprimir: $e', Colors.red);
+      }
+    }
   }
 }
