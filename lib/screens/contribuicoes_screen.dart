@@ -3,6 +3,7 @@ import 'package:flutter_dashboard_3/screens/pdf_preview_screen.dart';
 import 'package:flutter_dashboard_3/services/database_service.dart';
 import 'package:flutter_dashboard_3/models/contribuicao.dart';
 import 'package:flutter_dashboard_3/services/pdf_service.dart';
+import 'package:flutter_dashboard_3/utils/currency_format.dart';
 import 'package:flutter_dashboard_3/widgets/custom_dropdown_form_field.dart';
 import 'package:flutter_dashboard_3/widgets/modals/contribuicao_form_modal.dart';
 import 'package:flutter_dashboard_3/widgets/card_financeiro.dart';
@@ -622,7 +623,8 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('R\$ ${contribuicao.valor.toStringAsFixed(2)}'),
+            //Text('R\$ ${contribuicao.valor.toStringAsFixed(2)}'),
+            Text(currencyFormat.format(contribuicao.valor)),
             Text(
               _getStatusText(contribuicao.status),
               style: TextStyle(

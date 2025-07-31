@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter_dashboard_3/utils/currency_format.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter/services.dart';
@@ -66,7 +67,7 @@ class PdfService {
 
               pw.Text('A importância de:', style: pw.TextStyle(fontSize: 14)),
               pw.Text(
-                'R\$ ${contribuicao.valor.toStringAsFixed(2)} (${_numberToWords(contribuicao.valor)})',
+                '${currencyFormat.format(contribuicao.valor)} (${_numberToWords(contribuicao.valor)})',
                 style: pw.TextStyle(
                   fontSize: 16,
                   fontWeight: pw.FontWeight.bold,
@@ -159,10 +160,87 @@ class PdfService {
         '${date.year}';
   }
 
+  //   static String _numberToWords(double value) {
+  //     // Implementação simplificada - considere usar um pacote como 'number_to_words' para uma solução completa
+  //     final units = [
+  //       '',
+  //       'um',
+  //       'dois',
+  //       'três',
+  //       'quatro',
+  //       'cinco',
+  //       'seis',
+  //       'sete',
+  //       'oito',
+  //       'nove',
+  //       'dez',
+  //       'onze',
+  //       'doze',
+  //       'treze',
+  //       'quatorze',
+  //       'quinze',
+  //       'dezesseis',
+  //       'dezessete',
+  //       'dezoito',
+  //       'dezenove',
+  //     ];
+  //     final tens = [
+  //       '',
+  //       '',
+  //       'vinte',
+  //       'trinta',
+  //       'quarenta',
+  //       'cinquenta',
+  //       'sessenta',
+  //       'setenta',
+  //       'oitenta',
+  //       'noventa',
+  //     ];
+  //     final hundreds = [
+  //       '',
+  //       'cento',
+  //       'duzentos',
+  //       'trezentos',
+  //       'quatrocentos',
+  //       'quinhentos',
+  //       'seiscentos',
+  //       'setecentos',
+  //       'oitocentos',
+  //       'novecentos',
+  //     ];
+
+  //     int real = value.toInt();
+  //     int cents = ((value - real) * 100).round();
+
+  //     String result = '';
+
+  //     if (real == 0) {
+  //       result = 'zero';
+  //     } else if (real < 20) {
+  //       result = units[real];
+  //     } else if (real < 100) {
+  //       result =
+  //           '${tens[real ~/ 10]}${real % 10 != 0 ? ' e ${units[real % 10]}' : ''}';
+  //     } else if (real < 1000) {
+  //       result =
+  //           '${hundreds[real ~/ 100]}${real % 100 != 0 ? ' e ${_numberToWords(real % 100)}' : ''}';
+  //     } else {
+  //       result = 'valor muito alto';
+  //     }
+
+  //     result += ' real${real != 1 ? 'es' : ''}';
+
+  //     if (cents > 0) {
+  //       result +=
+  //           ' e ${_numberToWords(cents.toDouble())} centavo${cents != 1 ? 's' : ''}';
+  //     }
+
+  //     return result;
+  //   }
+
   static String _numberToWords(double value) {
-    // Implementação simplificada - considere usar um pacote como 'number_to_words' para uma solução completa
     final units = [
-      '',
+      'zero',
       'um',
       'dois',
       'três',
@@ -176,13 +254,14 @@ class PdfService {
       'onze',
       'doze',
       'treze',
-      'quatorze',
+      'catorze',
       'quinze',
       'dezesseis',
       'dezessete',
       'dezoito',
       'dezenove',
     ];
+
     final tens = [
       '',
       '',
@@ -195,9 +274,10 @@ class PdfService {
       'oitenta',
       'noventa',
     ];
+
     final hundreds = [
       '',
-      'cento',
+      'cem',
       'duzentos',
       'trezentos',
       'quatrocentos',
@@ -211,27 +291,47 @@ class PdfService {
     int real = value.toInt();
     int cents = ((value - real) * 100).round();
 
-    String result = '';
+    String convert(int number) {
+      if (number < 20) return units[number];
 
-    if (real == 0) {
-      result = 'zero';
-    } else if (real < 20) {
-      result = units[real];
-    } else if (real < 100) {
-      result =
-          '${tens[real ~/ 10]}${real % 10 != 0 ? ' e ${units[real % 10]}' : ''}';
-    } else if (real < 1000) {
-      result =
-          '${hundreds[real ~/ 100]}${real % 100 != 0 ? ' e ${_numberToWords(real % 100)}' : ''}';
-    } else {
-      result = 'valor muito alto';
+      if (number < 100) {
+        return tens[number ~/ 10] +
+            ((number % 10 != 0) ? ' e ${units[number % 10]}' : '');
+      }
+
+      if (number < 1000) {
+        if (number == 100) return 'cem';
+        return hundreds[number ~/ 100] +
+            ((number % 100 != 0) ? ' e ${convert(number % 100)}' : '');
+      }
+
+      if (number < 1000000) {
+        final thousand = convert(number ~/ 1000);
+        final remainder = number % 1000;
+        return '$thousand mil' +
+            (remainder != 0 ? ' e ${convert(remainder)}' : '');
+      }
+
+      return 'valor muito alto';
     }
 
-    result += ' real${real != 1 ? 'es' : ''}';
+    String result = convert(real);
+
+    // Ajustes gramaticais para PT-BR
+    if (real == 1) {
+      result += ' real';
+    } else if (real > 1) {
+      result += ' reais';
+    }
 
     if (cents > 0) {
-      result +=
-          ' e ${_numberToWords(cents.toDouble())} centavo${cents != 1 ? 's' : ''}';
+      result += ' e ${convert(cents)}';
+      result += (cents == 1) ? ' centavo' : ' centavos';
+    }
+
+    // Capitaliza a primeira letra
+    if (result.isNotEmpty) {
+      result = result[0].toUpperCase() + result.substring(1);
     }
 
     return result;
