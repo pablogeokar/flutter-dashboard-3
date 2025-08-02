@@ -76,6 +76,71 @@ class AppTheme {
     ],
   );
 
+  // Design System - Espaçamentos
+  static const double spacingXS = 4.0;
+  static const double spacingS = 8.0;
+  static const double spacingM = 16.0;
+  static const double spacingL = 24.0;
+  static const double spacingXL = 32.0;
+  static const double spacingXXL = 48.0;
+
+  // Design System - Border Radius
+  static const double radiusS = 4.0;
+  static const double radiusM = 8.0;
+  static const double radiusL = 12.0;
+  static const double radiusXL = 16.0;
+  static const double radiusXXL = 24.0;
+
+  // Design System - Elevation
+  static const double elevationS = 1.0;
+  static const double elevationM = 2.0;
+  static const double elevationL = 4.0;
+  static const double elevationXL = 8.0;
+
+  // Design System - Tipografia
+  static const TextStyle headline1 = TextStyle(
+    fontSize: 32,
+    fontWeight: FontWeight.bold,
+    letterSpacing: -0.5,
+  );
+
+  static const TextStyle headline2 = TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.w600,
+    letterSpacing: -0.25,
+  );
+
+  static const TextStyle headline3 = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+  );
+
+  static const TextStyle headline4 = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w500,
+  );
+
+  static const TextStyle body1 = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.normal,
+  );
+
+  static const TextStyle body2 = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+  );
+
+  static const TextStyle caption = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.normal,
+  );
+
+  static const TextStyle button = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    letterSpacing: 0.5,
+  );
+
   // ThemeData claro
   static ThemeData get themeData {
     return ThemeData(
@@ -124,7 +189,7 @@ class AppTheme {
     );
   }
 
-  // Tema claro
+  // Tema claro melhorado
   static final ThemeData light = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
@@ -134,22 +199,81 @@ class AppTheme {
       error: errorColor,
       surface: const Color(0xFFE2E8F0),
       surfaceContainerLowest: background,
+      onSurface: textPrimary,
+      onSurfaceVariant: textSecondary,
     ),
     appBarTheme: const AppBarTheme(
       centerTitle: false,
-      elevation: 1,
-      scrolledUnderElevation: 2,
+      elevation: elevationS,
+      scrolledUnderElevation: elevationM,
+      backgroundColor: primaryColor,
+      foregroundColor: Colors.white,
     ),
-    cardTheme: const CardThemeData(
-      elevation: 2,
-      margin: EdgeInsets.all(8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
+    cardTheme: CardThemeData(
+      elevation: elevationM,
+      margin: const EdgeInsets.all(spacingM),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(radiusL)),
       ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        elevation: elevationS,
+        padding: const EdgeInsets.symmetric(
+          horizontal: spacingL,
+          vertical: spacingM,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusM),
+        ),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(
+          horizontal: spacingL,
+          vertical: spacingM,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusM),
+        ),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(
+          horizontal: spacingM,
+          vertical: spacingS,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusM),
+        ),
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(radiusL)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(radiusL),
+        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(radiusL),
+        borderSide: const BorderSide(color: primaryColor, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(radiusL),
+        borderSide: const BorderSide(color: errorColor, width: 2),
+      ),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: spacingM,
+        vertical: spacingM,
+      ),
+      filled: true,
+      fillColor: const Color(0xFFF8FAFC),
     ),
   );
 
-  // Tema escuro
+  // Tema escuro melhorado
   static final ThemeData dark = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
@@ -159,18 +283,78 @@ class AppTheme {
       error: errorColor,
       surface: const Color(0xFF1A1A1A),
       surfaceContainerLowest: const Color(0xFF0F0F0F),
+      onSurface: textOnDark,
+      onSurfaceVariant: Colors.grey,
     ),
     appBarTheme: const AppBarTheme(
       centerTitle: false,
-      elevation: 1,
-      scrolledUnderElevation: 2,
+      elevation: elevationS,
+      scrolledUnderElevation: elevationM,
+      backgroundColor: Color(0xFF1A1A1A),
+      foregroundColor: Colors.white,
     ),
-    cardTheme: const CardThemeData(
-      elevation: 2,
-      margin: EdgeInsets.all(8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
+    cardTheme: CardThemeData(
+      elevation: elevationM,
+      margin: const EdgeInsets.all(spacingM),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(radiusL)),
       ),
+      color: const Color(0xFF1E1E1E),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        elevation: elevationS,
+        padding: const EdgeInsets.symmetric(
+          horizontal: spacingL,
+          vertical: spacingM,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusM),
+        ),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(
+          horizontal: spacingL,
+          vertical: spacingM,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusM),
+        ),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(
+          horizontal: spacingM,
+          vertical: spacingS,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusM),
+        ),
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(radiusL)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(radiusL),
+        borderSide: const BorderSide(color: Color(0xFF424242)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(radiusL),
+        borderSide: const BorderSide(color: primaryColor, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(radiusL),
+        borderSide: const BorderSide(color: errorColor, width: 2),
+      ),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: spacingM,
+        vertical: spacingM,
+      ),
+      filled: true,
+      fillColor: const Color(0xFF2A2A2A),
     ),
   );
 }

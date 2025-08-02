@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dashboard_3/theme.dart';
 
 // Widget para campos de texto customizados
 class CustomTextFormField extends StatelessWidget {
@@ -7,6 +8,7 @@ class CustomTextFormField extends StatelessWidget {
   final String label;
   final String? hintText;
   final IconData? prefixIcon;
+  final IconData? suffixIcon;
   final TextInputType keyboardType;
   final bool isRequired;
   final int maxLines;
@@ -14,7 +16,9 @@ class CustomTextFormField extends StatelessWidget {
   final String? Function(String?)? validator;
   final bool readOnly;
   final VoidCallback? onTap;
+  final VoidCallback? onSuffixIconTap;
   final bool isUpperCase;
+  final bool obscureText;
 
   const CustomTextFormField({
     super.key,
@@ -22,6 +26,7 @@ class CustomTextFormField extends StatelessWidget {
     required this.label,
     this.hintText,
     this.prefixIcon,
+    this.suffixIcon,
     this.keyboardType = TextInputType.text,
     this.isRequired = false,
     this.maxLines = 1,
@@ -29,7 +34,9 @@ class CustomTextFormField extends StatelessWidget {
     this.validator,
     this.readOnly = false,
     this.onTap,
+    this.onSuffixIconTap,
     this.isUpperCase = false,
+    this.obscureText = false,
   });
 
   @override
@@ -54,56 +61,71 @@ class CustomTextFormField extends StatelessWidget {
       maxLines: maxLines,
       readOnly: readOnly,
       onTap: onTap,
+      obscureText: obscureText,
       inputFormatters: formatters,
-      style: TextStyle(color: colorScheme.onSurface),
-      cursorColor: const Color(0xFF00BCD4),
+      style: TextStyle(
+        color: colorScheme.onSurface,
+        fontSize: AppTheme.body2.fontSize,
+      ),
+      cursorColor: AppTheme.primaryColor,
       textCapitalization: isUpperCase
           ? TextCapitalization.characters
           : TextCapitalization.none,
       decoration: InputDecoration(
         labelText: isRequired ? '$label *' : label,
         labelStyle: TextStyle(
-          color: colorScheme.onSurface.withValues(alpha: 0.6),
+          color: colorScheme.onSurfaceVariant,
+          fontSize: AppTheme.body2.fontSize,
         ),
         hintText: hintText,
         hintStyle: TextStyle(
-          color: colorScheme.onSurface.withValues(alpha: 0.6),
+          color: colorScheme.onSurfaceVariant,
+          fontSize: AppTheme.body2.fontSize,
         ),
         prefixIcon: prefixIcon != null
-            ? Icon(
-                prefixIcon,
-                color: colorScheme.onSurface.withValues(alpha: 0.7),
+            ? Icon(prefixIcon, color: colorScheme.onSurfaceVariant, size: 20)
+            : null,
+        suffixIcon: suffixIcon != null
+            ? GestureDetector(
+                onTap: onSuffixIconTap,
+                child: Icon(
+                  suffixIcon,
+                  color: colorScheme.onSurfaceVariant,
+                  size: 20,
+                ),
               )
             : null,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppTheme.radiusL),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF424242)),
+          borderRadius: BorderRadius.circular(AppTheme.radiusL),
+          borderSide: BorderSide(
+            color: isDark
+                ? Colors.grey.withValues(alpha: 0.3)
+                : AppTheme.divider,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF00BCD4), width: 2),
+          borderRadius: BorderRadius.circular(AppTheme.radiusL),
+          borderSide: BorderSide(color: AppTheme.primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
+          borderRadius: BorderRadius.circular(AppTheme.radiusL),
+          borderSide: BorderSide(color: AppTheme.error, width: 2),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
+          borderRadius: BorderRadius.circular(AppTheme.radiusL),
+          borderSide: BorderSide(color: AppTheme.error, width: 2),
         ),
         filled: true,
         fillColor: readOnly
             ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-            : (isDark
-                  ? const Color(0xFF2A2A2A)
-                  : colorScheme.surfaceContainerHighest),
+            : colorScheme.surfaceContainerHighest,
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
+          horizontal: AppTheme.spacingM,
+          vertical: AppTheme.spacingM,
         ),
       ),
       validator:
