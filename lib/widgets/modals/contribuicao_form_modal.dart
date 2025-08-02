@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dashboard_3/services/contabilidade_service.dart';
+import 'package:flutter_dashboard_3/utils/get_nome_sobrenome.dart';
 import 'package:flutter_dashboard_3/widgets/custom_text_form_field.dart';
 import 'package:flutter_dashboard_3/models/contribuicao.dart';
 import 'package:flutter_dashboard_3/services/database_service.dart';
@@ -101,6 +103,18 @@ class _ContribuicaoFormModalState extends State<ContribuicaoFormModal> {
           );
 
           await db.updateContribuicao(contribuicaoAtualizada);
+
+          if (_statusSelecionado == 'pago') {
+            // Registrar a contribuição no serviço de contabilidade
+            final contabilidadeService = ContabilidadeService();
+            await contabilidadeService.receberContribuicaoMensal(
+              nomeMembro: getNomeSobrenome(
+                widget.contribuicao!.membroNome ?? 'Membro não encontrado',
+              ),
+              valor: contribuicaoAtualizada.valor,
+              emDinheiro: true, // ou false para banco
+            );
+          }
 
           if (mounted) {
             _mostrarMensagem(

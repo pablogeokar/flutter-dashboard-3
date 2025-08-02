@@ -1,77 +1,122 @@
+// models/lancamento_contabil.dart
+import 'package:flutter_dashboard_3/models/partida_contabil.dart';
+
 class LancamentoContabil {
   final int? id;
-  final DateTime data;
-  final double valor;
+  final String numeroLancamento;
+  final DateTime dataLancamento;
+  final double valorTotal;
   final String historico;
+  final String? tipoDocumento;
+  final String? numeroDocumento;
+  final String? observacoes;
   final int? usuarioId;
   final int? templateId;
-  final DateTime dataCriacao;
-  final DateTime? dataAlteracao;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final List<PartidaContabil>? partidas;
 
   LancamentoContabil({
     this.id,
-    required this.valor,
+    required this.numeroLancamento,
+    required this.dataLancamento,
+    required this.valorTotal,
     required this.historico,
-    DateTime? data,
+    this.tipoDocumento,
+    this.numeroDocumento,
+    this.observacoes,
     this.usuarioId,
     this.templateId,
-    DateTime? dataCriacao,
-    this.dataAlteracao,
-  }) : data = data ?? DateTime.now(),
-       dataCriacao = dataCriacao ?? DateTime.now();
+    required this.createdAt,
+    required this.updatedAt,
+    this.partidas,
+  });
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'data': data.toIso8601String(),
-      'valor': valor,
+      'numero_lancamento': numeroLancamento,
+      'data_lancamento': dataLancamento.toIso8601String(),
+      'valor_total': valorTotal,
       'historico': historico,
-      'usuarioId': usuarioId,
-      'templateId': templateId,
-      'data_criacao': dataCriacao.toIso8601String(),
-      'data_alteracao': dataAlteracao?.toIso8601String(),
+      'tipo_documento': tipoDocumento,
+      'numero_documento': numeroDocumento,
+      'observacoes': observacoes,
+      'usuario_id': usuarioId,
+      'template_id': templateId,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
     };
   }
 
-  factory LancamentoContabil.fromMap(Map<String, dynamic> map) {
+  factory LancamentoContabil.fromMap(
+    Map<String, dynamic> map, {
+    List<PartidaContabil>? partidas,
+  }) {
     return LancamentoContabil(
-      id: map['id'],
-      data: map['data'] != null ? DateTime.parse(map['data']) : DateTime.now(),
-      valor: map['valor'],
-      historico: map['historico'],
-      usuarioId: map['usuarioId'],
-      templateId: map['templateId'],
-      dataCriacao: DateTime.parse(map['data_criacao']),
-      dataAlteracao: map['data_alteracao'] != null
-          ? DateTime.parse(map['data_alteracao'])
-          : null,
+      id: map['id']?.toInt(),
+      numeroLancamento: map['numero_lancamento'] ?? '',
+      dataLancamento: DateTime.parse(map['data_lancamento']),
+      valorTotal: map['valor_total']?.toDouble() ?? 0.0,
+      historico: map['historico'] ?? '',
+      tipoDocumento: map['tipo_documento'],
+      numeroDocumento: map['numero_documento'],
+      observacoes: map['observacoes'],
+      usuarioId: map['usuario_id']?.toInt(),
+      templateId: map['template_id']?.toInt(),
+      createdAt: DateTime.parse(map['created_at']),
+      updatedAt: DateTime.parse(map['updated_at']),
+      partidas: partidas,
     );
   }
 
   LancamentoContabil copyWith({
     int? id,
-    DateTime? data,
-    double? valor,
+    String? numeroLancamento,
+    DateTime? dataLancamento,
+    double? valorTotal,
     String? historico,
+    String? tipoDocumento,
+    String? numeroDocumento,
+    String? observacoes,
     int? usuarioId,
     int? templateId,
-    DateTime? dataCriacao,
-    DateTime? dataAlteracao,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    List<PartidaContabil>? partidas,
   }) {
     return LancamentoContabil(
       id: id ?? this.id,
-      data: data ?? this.data,
-      valor: valor ?? this.valor,
+      numeroLancamento: numeroLancamento ?? this.numeroLancamento,
+      dataLancamento: dataLancamento ?? this.dataLancamento,
+      valorTotal: valorTotal ?? this.valorTotal,
       historico: historico ?? this.historico,
+      tipoDocumento: tipoDocumento ?? this.tipoDocumento,
+      numeroDocumento: numeroDocumento ?? this.numeroDocumento,
+      observacoes: observacoes ?? this.observacoes,
       usuarioId: usuarioId ?? this.usuarioId,
       templateId: templateId ?? this.templateId,
-      dataCriacao: dataCriacao ?? this.dataCriacao,
-      dataAlteracao: dataAlteracao ?? this.dataAlteracao,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      partidas: partidas ?? this.partidas,
     );
   }
 
   @override
   String toString() {
-    return 'LancamentoContabil(id: $id, data: $data, valor: $valor, historico: $historico, usuarioId: $usuarioId, templateId: $templateId)';
+    return 'LancamentoContabil(id: $id, numero: $numeroLancamento, data: $dataLancamento, valor: $valorTotal, historico: $historico)';
+  }
+
+  bool get isBalanceado {
+    if (partidas == null || partidas!.length != 2) return false;
+
+    final debito = partidas!.firstWhere(
+      (p) => p.tipoMovimento == TipoMovimento.debito,
+    );
+    final credito = partidas!.firstWhere(
+      (p) => p.tipoMovimento == TipoMovimento.credito,
+    );
+
+    return debito.valor == credito.valor && debito.valor == valorTotal;
   }
 }

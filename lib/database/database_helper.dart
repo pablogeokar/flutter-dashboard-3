@@ -39,6 +39,6 @@ class DatabaseHelper {
     await db.delete('contribuicoes');
     await db.delete('membros');
     await db.delete('configuracoes');
-    await DatabaseMigrations.inserirConfiguracoesDefault(db);
+    await DatabaseMigrations.insertConfiguracoesDefault(db);
   }
 }
