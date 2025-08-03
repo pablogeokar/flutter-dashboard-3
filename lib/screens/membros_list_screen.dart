@@ -8,8 +8,7 @@ import 'package:flutter_dashboard_3/theme.dart';
 import '../widgets/modals/membros_form_modal.dart';
 import '../widgets/modals/excel_import_modal.dart';
 import '../widgets/data_table_custom.dart';
-import '../widgets/custom_text_form_field.dart';
-import '../widgets/custom_dropdown_form_field.dart';
+import '../widgets/filter_widget.dart';
 
 class MembrosListScreen extends StatefulWidget {
   const MembrosListScreen({super.key});
@@ -23,11 +22,6 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
   List<Membro> _membros = [];
   List<Membro> _membrosFiltrados = [];
   bool _isLoading = true;
-  String _filtroStatus = 'todos';
-  String _filtroNome = '';
-
-  // Controladores para os campos customizados
-  final TextEditingController _nomeController = TextEditingController();
 
   final List<String> _statusFilterList = [
     'todos',
@@ -65,18 +59,6 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
   void initState() {
     super.initState();
     _carregarMembros();
-
-    // Listener para o campo de busca
-    _nomeController.addListener(() {
-      _filtroNome = _nomeController.text;
-      _aplicarFiltros();
-    });
-  }
-
-  @override
-  void dispose() {
-    _nomeController.dispose();
-    super.dispose();
   }
 
   Future<void> _carregarMembros() async {
@@ -85,7 +67,7 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
       final membros = await _db.getMembros();
       setState(() {
         _membros = membros;
-        _aplicarFiltros();
+        _membrosFiltrados = membros; // Inicializar com todos os membros
         _isLoading = false;
       });
     } catch (e) {
@@ -94,14 +76,17 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
     }
   }
 
-  void _aplicarFiltros() {
+  void _aplicarFiltros(FilterValues filterValues) {
     setState(() {
       _membrosFiltrados = _membros.where((membro) {
+        final filtroStatus = filterValues['status'] ?? 'todos';
+        final filtroNome = filterValues['nome'] ?? '';
+
         final matchStatus =
-            _filtroStatus == 'todos' || membro.status == _filtroStatus;
+            filtroStatus == 'todos' || membro.status == filtroStatus;
         final matchNome =
-            _filtroNome.isEmpty ||
-            membro.nome.toLowerCase().contains(_filtroNome.toLowerCase());
+            filtroNome.isEmpty ||
+            membro.nome.toLowerCase().contains(filtroNome.toLowerCase());
         return matchStatus && matchNome;
       }).toList();
     });
@@ -326,47 +311,24 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
+          FilterWidget(
+            filters: [
+              CommonFilters.textSearch(
+                key: 'nome',
+                label: 'Buscar por nome',
+                hintText: 'Buscar por nome...',
                 flex: 2,
-                child: CustomTextFormField(
-                  controller: _nomeController,
-                  label: 'Buscar por nome',
-                  hintText: 'Buscar por nome...',
-                  prefixIcon: Icons.search,
-                ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: CustomDropdownFormField(
-                  value: _filtroStatus,
-                  label: 'Filtrar por Status',
-                  items: _statusFilterList,
-                  onChanged: (value) {
-                    setState(() => _filtroStatus = value!);
-                    _aplicarFiltros();
-                  },
-                ),
+              CommonFilters.statusDropdown(
+                key: 'status',
+                statusList: _statusFilterList,
+                label: 'Filtrar por Status',
+                initialValue: 'todos',
               ),
-              // const SizedBox(width: 16),
-              // Container(
-              //   decoration: BoxDecoration(
-              //     color: isDark
-              //         ? const Color(0xFF2A2A2A)
-              //         : colorScheme.surfaceContainerHighest,
-              //     borderRadius: BorderRadius.circular(12),
-              //     border: Border.all(color: colorScheme.outline),
-              //   ),
-              //   child: IconButton(
-              //     onPressed: _carregarMembros,
-              //     icon: const Icon(Icons.refresh, color: Color(0xFF00BCD4)),
-              //     tooltip: 'Atualizar',
-              //     iconSize: 24,
-              //   ),
-              // ),
             ],
+            onFiltersChanged: _aplicarFiltros,
+            padding: EdgeInsets.zero,
+            decoration: const BoxDecoration(),
           ),
         ],
       ),

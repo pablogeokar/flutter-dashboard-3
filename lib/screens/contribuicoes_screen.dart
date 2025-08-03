@@ -7,7 +7,7 @@ import 'package:flutter_dashboard_3/services/pdf_service.dart';
 import 'package:flutter_dashboard_3/utils/currency_format.dart';
 import 'package:flutter_dashboard_3/utils/get_nome_sobrenome.dart';
 import 'package:flutter_dashboard_3/widgets/custom_dropdown_form_field.dart';
-import 'package:flutter_dashboard_3/widgets/custom_text_form_field.dart';
+import 'package:flutter_dashboard_3/widgets/filter_widget.dart';
 import 'package:flutter_dashboard_3/widgets/modals/contribuicao_form_modal.dart';
 import 'package:flutter_dashboard_3/widgets/card_financeiro.dart';
 import 'package:flutter_dashboard_3/widgets/custom_button.dart';
@@ -27,13 +27,10 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
   List<Contribuicao> _contribuicoesFiltradas = [];
   Map<String, dynamic> _estatisticas = {};
   bool _isLoading = true;
-  String _filtroMembro = '';
+  bool _temFiltroAtivo = false;
 
   int _mesReferencia = DateTime.now().month;
   int _anoReferencia = DateTime.now().year;
-
-  // Controlador para o campo de busca por membro
-  final TextEditingController _membroController = TextEditingController();
 
   final List<String> _meses = [
     '',
@@ -55,18 +52,6 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
   void initState() {
     super.initState();
     _carregarDados();
-
-    // Listener para o campo de busca por membro
-    _membroController.addListener(() {
-      _filtroMembro = _membroController.text;
-      _aplicarFiltros();
-    });
-  }
-
-  @override
-  void dispose() {
-    _membroController.dispose();
-    super.dispose();
   }
 
   Future<void> _carregarDados() async {
@@ -88,7 +73,8 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
       setState(() {
         _contribuicoes = contribuicoes;
         _estatisticas = estatisticas;
-        _aplicarFiltros();
+        _contribuicoesFiltradas =
+            contribuicoes; // Inicializar com todas as contribuições
       });
     } catch (e) {
       _mostrarMensagem('Erro ao carregar dados: $e', Colors.red);
@@ -97,13 +83,16 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
     }
   }
 
-  void _aplicarFiltros() {
+  void _aplicarFiltros(FilterValues filterValues) {
     setState(() {
+      final filtroMembro = filterValues['membro'] ?? '';
+      _temFiltroAtivo = filtroMembro.isNotEmpty;
+
       _contribuicoesFiltradas = _contribuicoes.where((contribuicao) {
         final matchMembro =
-            _filtroMembro.isEmpty ||
+            filtroMembro.isEmpty ||
             (contribuicao.membroNome ?? '').toLowerCase().contains(
-              _filtroMembro.toLowerCase(),
+              filtroMembro.toLowerCase(),
             );
         return matchMembro;
       }).toList();
@@ -445,11 +434,17 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
             const SizedBox(height: AppTheme.spacingM),
 
             // Campo de busca por membro
-            CustomTextFormField(
-              controller: _membroController,
-              label: 'Buscar por membro',
-              hintText: 'Digite o nome do membro...',
-              prefixIcon: Icons.search,
+            FilterWidget(
+              filters: [
+                CommonFilters.textSearch(
+                  key: 'membro',
+                  label: 'Buscar por membro',
+                  hintText: 'Digite o nome do membro...',
+                ),
+              ],
+              onFiltersChanged: _aplicarFiltros,
+              padding: EdgeInsets.zero,
+              decoration: const BoxDecoration(),
             ),
             const SizedBox(height: AppTheme.spacingM),
 
@@ -534,11 +529,11 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
 
   Widget _buildContribuicoesList() {
     final contribuicoesParaExibir =
-        _contribuicoesFiltradas.isNotEmpty || _filtroMembro.isNotEmpty
+        _contribuicoesFiltradas.isNotEmpty || _temFiltroAtivo
         ? _contribuicoesFiltradas
         : _contribuicoes;
 
-    if (contribuicoesParaExibir.isEmpty && _filtroMembro.isNotEmpty) {
+    if (contribuicoesParaExibir.isEmpty && _temFiltroAtivo) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
