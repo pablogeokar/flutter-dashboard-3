@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dashboard_3/theme.dart';
 
 // Widget para Dropdown customizado
 class CustomDropdownFormField extends StatelessWidget {
@@ -52,7 +53,7 @@ class CustomDropdownFormField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF00BCD4), width: 2),
+          borderSide: BorderSide(color: AppTheme.primaryColor, width: 1),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

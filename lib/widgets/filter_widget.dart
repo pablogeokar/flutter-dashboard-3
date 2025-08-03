@@ -300,60 +300,75 @@ class _FilterWidgetState extends State<FilterWidget> {
               ),
             ],
           ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Campos de filtro
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Construir campos de filtro dinamicamente
-              ...widget.filters
-                  .asMap()
-                  .entries
-                  .map((entry) {
-                    final index = entry.key;
-                    final filter = entry.value;
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Container flexível para os filtros
+            Expanded(
+              child: Row(
+                children: [
+                  // Campos de filtro
+                  ...widget.filters
+                      .asMap()
+                      .entries
+                      .map((entry) {
+                        final index = entry.key;
+                        final filter = entry.value;
 
-                    return [
-                      Expanded(
-                        flex: filter.flex,
-                        child: _buildFilterField(filter),
-                      ),
-                      if (index < widget.filters.length - 1)
-                        SizedBox(width: widget.spacing),
-                    ];
-                  })
-                  .expand((widgets) => widgets),
-            ],
-          ),
-
-          // Botões de ação (se necessário)
-          if (widget.showClearButton || widget.showApplyButton) ...[
-            SizedBox(height: widget.spacing),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                if (widget.showClearButton)
-                  CustomButton(
-                    text: 'Limpar',
-                    variant: ButtonVariant.outline,
-                    icon: Icons.clear,
-                    onPressed: _clearFilters,
-                  ),
-                if (widget.showClearButton && widget.showApplyButton)
-                  const SizedBox(width: AppTheme.spacingM),
-                if (widget.showApplyButton)
-                  CustomButton(
-                    text: 'Aplicar',
-                    variant: ButtonVariant.primary,
-                    icon: Icons.filter_list,
-                    onPressed: _applyFilters,
-                  ),
-              ],
+                        return [
+                          Expanded(
+                            flex: filter.flex,
+                            child: _buildFilterField(filter),
+                          ),
+                          if (index < widget.filters.length - 1)
+                            SizedBox(width: widget.spacing),
+                        ];
+                      })
+                      .expand((widgets) => widgets),
+                ],
+              ),
             ),
+
+            // Botões de ação na mesma linha com espaçamento
+            if (widget.showClearButton || widget.showApplyButton) ...[
+              SizedBox(width: widget.spacing),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (widget.showClearButton)
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minWidth: 80,
+                        maxWidth: 120,
+                      ),
+                      child: CustomButton(
+                        text: 'Limpar',
+                        variant: ButtonVariant.outline,
+                        icon: Icons.clear,
+                        onPressed: _clearFilters,
+                      ),
+                    ),
+                  if (widget.showClearButton && widget.showApplyButton)
+                    const SizedBox(width: AppTheme.spacingS),
+                  if (widget.showApplyButton)
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minWidth: 80,
+                        maxWidth: 120,
+                      ),
+                      child: CustomButton(
+                        text: 'Aplicar',
+                        variant: ButtonVariant.primary,
+                        icon: Icons.filter_list,
+                        onPressed: _applyFilters,
+                      ),
+                    ),
+                ],
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
