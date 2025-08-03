@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dashboard_3/theme.dart';
+import 'package:flutter_dashboard_3/widgets/custom_card.dart';
 
 class CardFinanceiro extends StatelessWidget {
   final String titulo;
@@ -16,9 +18,10 @@ class CardFinanceiro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return CustomCard(
+      variant: CardVariant.default_,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppTheme.spacingM),
         child: LayoutBuilder(
           builder: (context, constraints) {
             // Determine if we should use vertical or horizontal layout
@@ -29,28 +32,27 @@ class CardFinanceiro extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(AppTheme.spacingS),
                     decoration: BoxDecoration(
                       color: cor.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(icone, color: cor, size: 24),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppTheme.spacingS),
                   Text(
                     titulo,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                    style: AppTheme.caption.copyWith(color: Colors.grey[500]),
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppTheme.spacingXS),
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
                       valor,
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: AppTheme.body1.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -62,14 +64,14 @@ class CardFinanceiro extends StatelessWidget {
               return Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(AppTheme.spacingS),
                     decoration: BoxDecoration(
                       color: cor.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(icone, color: cor, size: 24),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppTheme.spacingM),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,21 +79,19 @@ class CardFinanceiro extends StatelessWidget {
                       children: [
                         Text(
                           titulo,
-                          style: TextStyle(
-                            fontSize: 14,
+                          style: AppTheme.body2.copyWith(
                             color: Colors.grey[500],
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppTheme.spacingXS),
                         FittedBox(
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.centerLeft,
                           child: Text(
                             valor,
-                            style: const TextStyle(
-                              fontSize: 18,
+                            style: AppTheme.headline4.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dashboard_3/models/membro.dart';
 import 'package:flutter_dashboard_3/services/database_service.dart';
 import 'package:flutter_dashboard_3/widgets/icon_styled.dart';
+import 'package:flutter_dashboard_3/widgets/status_chip.dart';
+import 'package:flutter_dashboard_3/theme.dart';
 import '../widgets/modals/membros_form_modal.dart';
 import '../widgets/modals/excel_import_modal.dart';
 import '../widgets/data_table_custom.dart';
@@ -208,91 +210,29 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
   }
 
   Widget _buildStatusChip(String status) {
-    Color color;
-    Color backgroundColor;
-    IconData icon;
-
-    switch (status.toLowerCase()) {
-      case 'ativo':
-        color = const Color(0xFF4CAF50);
-        backgroundColor = const Color(0xFF4CAF50).withValues(alpha: 0.15);
-        icon = Icons.check_circle;
-        break;
-      case 'inativo':
-        color = const Color(0xFFE53E3E);
-        backgroundColor = const Color(0xFFE53E3E).withValues(alpha: 0.15);
-        icon = Icons.cancel;
-        break;
-      case 'pausado':
-        color = const Color(0xFFFF9800);
-        backgroundColor = const Color(0xFFFF9800).withValues(alpha: 0.15);
-        icon = Icons.pause_circle;
-        break;
-      default:
-        color = const Color(0xFF9E9E9E);
-        backgroundColor = const Color(0xFF9E9E9E).withValues(alpha: 0.15);
-        icon = Icons.help;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 16),
-          const SizedBox(width: 6),
-          Text(
-            status.toUpperCase(),
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ],
-      ),
-    );
+    return StatusChipHelper.membroStatus(status);
   }
 
   Widget _buildActionsButtons(Membro membro) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF2196F3).withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: IconButton(
-            onPressed: () => _abrirFormulario(membro: membro),
-            icon: const Icon(Icons.edit, color: Color(0xFF2196F3)),
-            tooltip: 'Editar',
-            iconSize: 20,
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-            padding: EdgeInsets.zero,
-          ),
+        IconButton(
+          onPressed: () => _abrirFormulario(membro: membro),
+          icon: const Icon(Icons.edit, color: AppTheme.primaryColor),
+          tooltip: 'Editar',
+          iconSize: 20,
+          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+          padding: EdgeInsets.zero,
         ),
-        const SizedBox(width: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFE53E3E).withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: IconButton(
-            onPressed: () => _confirmarExclusao(membro),
-            icon: const Icon(Icons.delete, color: Color(0xFFE53E3E)),
-            tooltip: 'Excluir',
-            iconSize: 20,
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-            padding: EdgeInsets.zero,
-          ),
+        const SizedBox(width: AppTheme.spacingXS),
+        IconButton(
+          onPressed: () => _confirmarExclusao(membro),
+          icon: const Icon(Icons.delete, color: AppTheme.error),
+          tooltip: 'Excluir',
+          iconSize: 20,
+          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+          padding: EdgeInsets.zero,
         ),
       ],
     );

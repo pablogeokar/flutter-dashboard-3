@@ -9,6 +9,11 @@ import 'package:flutter_dashboard_3/utils/get_nome_sobrenome.dart';
 import 'package:flutter_dashboard_3/widgets/custom_dropdown_form_field.dart';
 import 'package:flutter_dashboard_3/widgets/modals/contribuicao_form_modal.dart';
 import 'package:flutter_dashboard_3/widgets/card_financeiro.dart';
+import 'package:flutter_dashboard_3/widgets/custom_button.dart';
+import 'package:flutter_dashboard_3/widgets/custom_card.dart';
+import 'package:flutter_dashboard_3/widgets/custom_loading.dart';
+import 'package:flutter_dashboard_3/widgets/status_chip.dart';
+import 'package:flutter_dashboard_3/theme.dart';
 
 class ContribuicoesScreen extends StatefulWidget {
   const ContribuicoesScreen({super.key});
@@ -329,98 +334,102 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Contribuições Mensais'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            onPressed: _isLoading ? null : _carregarDados,
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Atualizar',
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                // Filtros e estatísticas
-                _buildHeaderSection(),
-
-                // Lista de contribuições
-                Expanded(
-                  child: _contribuicoes.isEmpty
-                      ? _buildEmptyState()
-                      : _buildContribuicoesList(),
-                ),
-              ],
+    return CustomLoadingOverlay(
+      isLoading: _isLoading,
+      loadingMessage: 'Carregando contribuições...',
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Contribuições Mensais'),
+          backgroundColor: Theme.of(context).primaryColor,
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+              onPressed: _isLoading ? null : _carregarDados,
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Atualizar',
             ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _isLoading ? null : _gerarContribuicoes,
-        icon: const Icon(Icons.add),
-        label: const Text('Gerar Contribuições'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+          ],
+        ),
+        body: Column(
+          children: [
+            // Filtros e estatísticas
+            _buildHeaderSection(),
+
+            // Lista de contribuições
+            Expanded(
+              child: _contribuicoes.isEmpty
+                  ? _buildEmptyState()
+                  : _buildContribuicoesList(),
+            ),
+          ],
+        ),
+        floatingActionButton: CustomButton(
+          text: 'Gerar Contribuições',
+          variant: ButtonVariant.primary,
+          icon: Icons.add,
+          onPressed: _isLoading ? null : _gerarContribuicoes,
+        ),
       ),
     );
   }
 
   Widget _buildHeaderSection() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          // Seletor de período
-          // No método _buildHeaderSection(), substitua os DropdownButtonFormField existentes por:
-          Row(
-            children: [
-              Expanded(
-                child: CustomDropdownFormField(
-                  value: _meses[_mesReferencia],
-                  label: 'Mês',
-                  items: _meses.sublist(1), // Remove o item vazio do início
-                  onChanged: (valor) {
-                    if (valor != null) {
-                      final novoMes = _meses.indexOf(valor);
-                      if (novoMes != _mesReferencia) {
-                        setState(() => _mesReferencia = novoMes);
-                        _carregarDados();
+    return CustomCard(
+      variant: CardVariant.outlined,
+      margin: const EdgeInsets.all(AppTheme.spacingL),
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingM),
+        child: Column(
+          children: [
+            // Seletor de período
+            Row(
+              children: [
+                Expanded(
+                  child: CustomDropdownFormField(
+                    value: _meses[_mesReferencia],
+                    label: 'Mês',
+                    items: _meses.sublist(1), // Remove o item vazio do início
+                    onChanged: (valor) {
+                      if (valor != null) {
+                        final novoMes = _meses.indexOf(valor);
+                        if (novoMes != _mesReferencia) {
+                          setState(() => _mesReferencia = novoMes);
+                          _carregarDados();
+                        }
                       }
-                    }
-                  },
-                  prefixIcon: Icons.calendar_today,
+                    },
+                    prefixIcon: Icons.calendar_today,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: CustomDropdownFormField(
-                  value: _anoReferencia.toString(),
-                  label: 'Ano',
-                  items: List.generate(10, (index) {
-                    final ano = DateTime.now().year - 5 + index;
-                    return ano.toString();
-                  }),
-                  onChanged: (valor) {
-                    if (valor != null) {
-                      final novoAno = int.parse(valor);
-                      if (novoAno != _anoReferencia) {
-                        setState(() => _anoReferencia = novoAno);
-                        _carregarDados();
+                const SizedBox(width: AppTheme.spacingM),
+                Expanded(
+                  child: CustomDropdownFormField(
+                    value: _anoReferencia.toString(),
+                    label: 'Ano',
+                    items: List.generate(10, (index) {
+                      final ano = DateTime.now().year - 5 + index;
+                      return ano.toString();
+                    }),
+                    onChanged: (valor) {
+                      if (valor != null) {
+                        final novoAno = int.parse(valor);
+                        if (novoAno != _anoReferencia) {
+                          setState(() => _anoReferencia = novoAno);
+                          _carregarDados();
+                        }
                       }
-                    }
-                  },
-                  prefixIcon: Icons.calendar_view_month,
+                    },
+                    prefixIcon: Icons.calendar_view_month,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
+              ],
+            ),
+            const SizedBox(height: AppTheme.spacingM),
 
-          // Estatísticas
-          if (_estatisticas.isNotEmpty) _buildEstatisticasCards(),
-        ],
+            // Estatísticas
+            if (_estatisticas.isNotEmpty) _buildEstatisticasCards(),
+          ],
+        ),
       ),
     );
   }
@@ -474,26 +483,22 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
             size: 64,
             color: Colors.grey[400],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.spacingM),
           Text(
             'Nenhuma contribuição encontrada',
-            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+            style: AppTheme.headline4.copyWith(color: Colors.grey[600]),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.spacingS),
           Text(
             'para ${_meses[_mesReferencia]}/$_anoReferencia',
-            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+            style: AppTheme.body2.copyWith(color: Colors.grey[500]),
           ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
+          const SizedBox(height: AppTheme.spacingL),
+          CustomButton(
+            text: 'Gerar Contribuições',
+            variant: ButtonVariant.primary,
+            icon: Icons.add,
             onPressed: _gerarContribuicoes,
-            icon: const Icon(Icons.add),
-            label: const Text('Gerar Contribuições'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            ),
           ),
         ],
       ),
@@ -512,8 +517,9 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
   }
 
   Widget _buildContribuicaoCard(Contribuicao contribuicao) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+    return CustomCard(
+      variant: CardVariant.default_,
+      margin: const EdgeInsets.only(bottom: AppTheme.spacingS),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: _getStatusColor(contribuicao.status),
@@ -528,36 +534,37 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
         ),
         title: Text(
           contribuicao.membroNome ?? 'Membro não encontrado',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: AppTheme.headline4,
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(currencyFormat.format(contribuicao.valor)),
             Text(
-              _getStatusText(contribuicao.status),
-              style: TextStyle(
-                color: _getStatusColor(contribuicao.status),
-                fontWeight: FontWeight.w500,
-              ),
+              currencyFormat.format(contribuicao.valor),
+              style: AppTheme.body1.copyWith(fontWeight: FontWeight.w600),
             ),
-            if (contribuicao.dataPagamento != null)
+            const SizedBox(height: AppTheme.spacingXS),
+            StatusChipHelper.contribuicaoStatus(contribuicao.status),
+            if (contribuicao.dataPagamento != null) ...[
+              const SizedBox(height: AppTheme.spacingXS),
               Text(
                 'Pago em: ${contribuicao.dataPagamento!.day.toString().padLeft(2, '0')}/'
                 '${contribuicao.dataPagamento!.month.toString().padLeft(2, '0')}/'
                 '${contribuicao.dataPagamento!.year}',
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                style: AppTheme.caption.copyWith(color: Colors.grey[600]),
               ),
+            ],
             if (contribuicao.observacoes != null &&
-                contribuicao.observacoes!.isNotEmpty)
+                contribuicao.observacoes!.isNotEmpty) ...[
+              const SizedBox(height: AppTheme.spacingXS),
               Text(
                 'Obs: ${contribuicao.observacoes}',
-                style: TextStyle(
-                  fontSize: 12,
+                style: AppTheme.caption.copyWith(
                   color: Colors.grey[600],
                   fontStyle: FontStyle.italic,
                 ),
               ),
+            ],
           ],
         ),
         trailing: PopupMenuButton<String>(
@@ -572,10 +579,10 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
               case 'cancelar':
                 _cancelarContribuicao(contribuicao);
                 break;
-              case 'visualizar': // Nova opção
+              case 'visualizar':
                 _visualizarRecibo(contribuicao);
                 break;
-              case 'imprimir': // Opção de impressão direta
+              case 'imprimir':
                 _imprimirRecibo(contribuicao);
                 break;
             }
@@ -586,7 +593,7 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
               child: Row(
                 children: [
                   Icon(Icons.edit, color: Colors.blue),
-                  SizedBox(width: 8),
+                  SizedBox(width: AppTheme.spacingS),
                   Text('Editar'),
                 ],
               ),
@@ -597,7 +604,7 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
                 child: Row(
                   children: [
                     Icon(Icons.preview, color: Colors.blue),
-                    SizedBox(width: 8),
+                    SizedBox(width: AppTheme.spacingS),
                     Text('Visualizar Recibo'),
                   ],
                 ),
@@ -607,7 +614,7 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
                 child: Row(
                   children: [
                     Icon(Icons.print, color: Colors.blue),
-                    SizedBox(width: 8),
+                    SizedBox(width: AppTheme.spacingS),
                     Text('Imprimir Recibo'),
                   ],
                 ),
@@ -619,7 +626,7 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
                 child: Row(
                   children: [
                     Icon(Icons.check, color: Colors.green),
-                    SizedBox(width: 8),
+                    SizedBox(width: AppTheme.spacingS),
                     Text('Marcar como Pago'),
                   ],
                 ),
@@ -629,7 +636,7 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
                 child: Row(
                   children: [
                     Icon(Icons.close, color: Colors.red),
-                    SizedBox(width: 8),
+                    SizedBox(width: AppTheme.spacingS),
                     Text('Cancelar'),
                   ],
                 ),

@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dashboard_3/services/database_service.dart';
 import 'package:flutter_dashboard_3/widgets/custom_text_form_field.dart';
+import 'package:flutter_dashboard_3/widgets/custom_button.dart';
+import 'package:flutter_dashboard_3/widgets/custom_card.dart';
+import 'package:flutter_dashboard_3/widgets/custom_loading.dart';
+import 'package:flutter_dashboard_3/theme.dart';
 
 class ConfiguracoesScreen extends StatefulWidget {
   const ConfiguracoesScreen({super.key});
@@ -109,187 +113,165 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Configurações'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-        actions: [
-          if (!_isLoading)
-            IconButton(
-              onPressed: _isSaving ? null : _salvarConfiguracoes,
-              icon: _isSaving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : const Icon(Icons.save),
-              tooltip: 'Salvar configurações',
-            ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    return CustomLoadingOverlay(
+      isLoading: _isLoading,
+      loadingMessage: 'Carregando configurações...',
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Configurações'),
+          backgroundColor: Theme.of(context).primaryColor,
+          foregroundColor: Colors.white,
+          actions: [
+            if (!_isLoading)
+              IconButton(
+                onPressed: _isSaving ? null : _salvarConfiguracoes,
+                icon: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        ),
+                      )
+                    : const Icon(Icons.save),
+                tooltip: 'Salvar configurações',
+              ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppTheme.spacingL),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Card de Configurações Gerais
+                _buildSectionCard(
+                  title: 'Configurações Gerais',
+                  icon: Icons.settings,
                   children: [
-                    // Card de Configurações Gerais
-                    _buildSectionCard(
-                      title: 'Configurações Gerais',
-                      icon: Icons.settings,
-                      children: [
-                        CustomTextFormField(
-                          controller: _nomeLojController,
-                          label: 'Nome da Loja',
-                          prefixIcon: Icons.business,
-                          isRequired: true,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'Nome da loja é obrigatório';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        CustomTextFormField(
-                          controller: _cnpjController,
-                          label: 'CNPJ',
-                          prefixIcon: Icons.business,
-                          isRequired: true,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'CNPJ da loja é obrigatório';
-                            }
-                            return null;
-                          },
-                        ),
-                      ],
+                    CustomTextFormField(
+                      controller: _nomeLojController,
+                      label: 'Nome da Loja',
+                      prefixIcon: Icons.business,
+                      isRequired: true,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Nome da loja é obrigatório';
+                        }
+                        return null;
+                      },
                     ),
-
-                    // Card de Configurações Financeiras
-                    _buildSectionCard(
-                      title: 'Configurações Financeiras',
-                      icon: Icons.monetization_on,
-                      children: [
-                        CustomTextFormField(
-                          controller: _valorContribuicaoController,
-                          label: 'Valor da Contribuição Mensal (R\$)',
-                          prefixIcon: Icons.attach_money,
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d+\.?\d{0,2}'),
-                            ),
-                          ],
-                          isRequired: true,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'Valor da contribuição é obrigatório';
-                            }
-                            final valor = double.tryParse(
-                              value.replaceAll(',', '.'),
-                            );
-                            if (valor == null || valor <= 0) {
-                              return 'Valor deve ser um número válido maior que zero';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: Colors.blue.withValues(alpha: 0.3),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                color: Colors.white70 /*Colors.blue[700]*/,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  'Este valor será usado como padrão ao gerar as contribuições mensais para todos os membros ativos.',
-                                  style: TextStyle(
-                                    //color: Colors.blue[700],
-                                    color: Colors.white70,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Botões de ação
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: _isSaving
-                                ? null
-                                : _carregarConfiguracoes,
-                            icon: const Icon(Icons.refresh),
-                            label: const Text('Recarregar'),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: _isSaving ? null : _salvarConfiguracoes,
-                            icon: _isSaving
-                                ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
-                                      ),
-                                    ),
-                                  )
-                                : const Icon(Icons.save),
-                            label: Text(_isSaving ? 'Salvando...' : 'Salvar'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                    const SizedBox(height: AppTheme.spacingM),
+                    CustomTextFormField(
+                      controller: _cnpjController,
+                      label: 'CNPJ',
+                      prefixIcon: Icons.business,
+                      isRequired: true,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'CNPJ da loja é obrigatório';
+                        }
+                        return null;
+                      },
                     ),
                   ],
                 ),
-              ),
+
+                const SizedBox(height: AppTheme.spacingL),
+
+                // Card de Configurações Financeiras
+                _buildSectionCard(
+                  title: 'Configurações Financeiras',
+                  icon: Icons.monetization_on,
+                  children: [
+                    CustomTextFormField(
+                      controller: _valorContribuicaoController,
+                      label: 'Valor da Contribuição Mensal (R\$)',
+                      prefixIcon: Icons.attach_money,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d+\.?\d{0,2}'),
+                        ),
+                      ],
+                      isRequired: true,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Valor da contribuição é obrigatório';
+                        }
+                        final valor = double.tryParse(
+                          value.replaceAll(',', '.'),
+                        );
+                        if (valor == null || valor <= 0) {
+                          return 'Valor deve ser um número válido maior que zero';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: AppTheme.spacingM),
+                    Container(
+                      padding: const EdgeInsets.all(AppTheme.spacingM),
+                      decoration: BoxDecoration(
+                        color: AppTheme.info.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusM),
+                        border: Border.all(
+                          color: AppTheme.info.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_outline, color: AppTheme.info),
+                          const SizedBox(width: AppTheme.spacingS),
+                          Expanded(
+                            child: Text(
+                              'Este valor será usado como padrão ao gerar as contribuições mensais para todos os membros ativos.',
+                              style: AppTheme.body2.copyWith(
+                                color: AppTheme.info,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: AppTheme.spacingXL),
+
+                // Botões de ação
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomButton(
+                        text: 'Recarregar',
+                        variant: ButtonVariant.outline,
+                        icon: Icons.refresh,
+                        onPressed: _isSaving ? null : _carregarConfiguracoes,
+                      ),
+                    ),
+                    const SizedBox(width: AppTheme.spacingM),
+                    Expanded(
+                      child: CustomButton(
+                        text: _isSaving ? 'Salvando...' : 'Salvar',
+                        variant: ButtonVariant.primary,
+                        icon: Icons.save,
+                        isLoading: _isSaving,
+                        onPressed: _isSaving ? null : _salvarConfiguracoes,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -298,28 +280,27 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
     required IconData icon,
     required List<Widget> children,
   }) {
-    return Card(
-      elevation: 2,
+    return CustomCard(
+      variant: CardVariant.default_,
+      margin: const EdgeInsets.only(bottom: AppTheme.spacingL),
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(AppTheme.spacingL),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(icon, color: Colors.white54, size: 28),
-                const SizedBox(width: 12),
+                Icon(icon, color: AppTheme.primaryColor, size: 28),
+                const SizedBox(width: AppTheme.spacingS),
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white54,
+                  style: AppTheme.headline3.copyWith(
+                    color: AppTheme.primaryColor,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppTheme.spacingL),
             ...children,
           ],
         ),

@@ -8,6 +8,7 @@ class StatusChip extends StatelessWidget {
   final StatusType type;
   final bool isSmall;
   final VoidCallback? onTap;
+  final IconData? icon;
 
   const StatusChip({
     super.key,
@@ -15,6 +16,7 @@ class StatusChip extends StatelessWidget {
     this.type = StatusType.neutral,
     this.isSmall = false,
     this.onTap,
+    this.icon,
   });
 
   @override
@@ -36,13 +38,24 @@ class StatusChip extends StatelessWidget {
         ),
         border: Border.all(color: colors.border, width: 1),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: colors.text,
-          fontSize: isSmall ? 10 : 12,
-          fontWeight: FontWeight.w500,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, color: colors.text, size: isSmall ? 12 : 14),
+            SizedBox(width: isSmall ? AppTheme.spacingXS : AppTheme.spacingS),
+          ],
+          Text(
+            label,
+            style: TextStyle(
+              color: colors.text,
+              fontSize: isSmall ? 10 : 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
 
@@ -122,11 +135,23 @@ class StatusChipHelper {
   static StatusChip membroStatus(String status) {
     switch (status.toLowerCase()) {
       case 'ativo':
-        return const StatusChip(label: 'Ativo', type: StatusType.success);
+        return const StatusChip(
+          label: 'Ativo',
+          type: StatusType.success,
+          icon: Icons.check_circle,
+        );
       case 'inativo':
-        return const StatusChip(label: 'Inativo', type: StatusType.error);
+        return const StatusChip(
+          label: 'Inativo',
+          type: StatusType.error,
+          icon: Icons.cancel,
+        );
       case 'pausado':
-        return const StatusChip(label: 'Pausado', type: StatusType.warning);
+        return const StatusChip(
+          label: 'Pausado',
+          type: StatusType.warning,
+          icon: Icons.pause_circle,
+        );
       default:
         return StatusChip(label: status, type: StatusType.neutral);
     }
@@ -135,11 +160,23 @@ class StatusChipHelper {
   static StatusChip contribuicaoStatus(String status) {
     switch (status.toLowerCase()) {
       case 'pago':
-        return const StatusChip(label: 'Pago', type: StatusType.success);
+        return const StatusChip(
+          label: 'Pago',
+          type: StatusType.success,
+          icon: Icons.check_circle,
+        );
       case 'pendente':
-        return const StatusChip(label: 'Pendente', type: StatusType.warning);
+        return const StatusChip(
+          label: 'Pendente',
+          type: StatusType.warning,
+          icon: Icons.schedule,
+        );
       case 'cancelado':
-        return const StatusChip(label: 'Cancelado', type: StatusType.error);
+        return const StatusChip(
+          label: 'Cancelado',
+          type: StatusType.error,
+          icon: Icons.cancel,
+        );
       default:
         return StatusChip(label: status, type: StatusType.neutral);
     }

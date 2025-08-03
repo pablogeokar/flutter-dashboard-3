@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dashboard_3/services/contabilidade_service.dart';
 import 'package:flutter_dashboard_3/utils/get_nome_sobrenome.dart';
 import 'package:flutter_dashboard_3/widgets/custom_text_form_field.dart';
+import 'package:flutter_dashboard_3/widgets/custom_button.dart';
+import 'package:flutter_dashboard_3/widgets/custom_loading.dart';
+import 'package:flutter_dashboard_3/theme.dart';
 import 'package:flutter_dashboard_3/models/contribuicao.dart';
 import 'package:flutter_dashboard_3/services/database_service.dart';
 
@@ -452,53 +455,31 @@ class _ContribuicaoFormModalState extends State<ContribuicaoFormModal> {
 
             // Footer com botões
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(AppTheme.spacingL),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(16),
-                  bottomRight: Radius.circular(16),
+                  bottomLeft: Radius.circular(AppTheme.radiusL),
+                  bottomRight: Radius.circular(AppTheme.radiusL),
                 ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(
+                  CustomButton(
+                    text: 'Cancelar',
+                    variant: ButtonVariant.text,
                     onPressed: _isLoading
                         ? null
                         : () => Navigator.pop(context, false),
-                    child: const Text('Cancelar'),
                   ),
-                  const SizedBox(width: 16),
-                  ElevatedButton(
+                  const SizedBox(width: AppTheme.spacingM),
+                  CustomButton(
+                    text: 'Salvar',
+                    variant: ButtonVariant.primary,
+                    icon: Icons.save,
+                    isLoading: _isLoading,
                     onPressed: _isLoading ? null : _salvarContribuicao,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 16,
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
-                              ),
-                            ),
-                          )
-                        : const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.save),
-                              SizedBox(width: 8),
-                              Text('Salvar'),
-                            ],
-                          ),
                   ),
                 ],
               ),

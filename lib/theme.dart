@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // Cores principais
-  static const Color primary = Color(0xFF1C2D4A); // Azul profundo
+  //static const Color primary = Color(0xFF1C2D4A); // Azul profundo
+  static const Color primary = Color(0xFFd35400);
   static const Color secondary = Color(0xFFD4AF37); // Dourado maçônico
-  static const Color primaryColor = Color(0xFF1C2D4A);
+  //static const Color primaryColor = Color(0xFF1C2D4A);
+  static const Color primaryColor = Color(0xFFcc8e35);
   static const Color secondaryColor = Color(0xFFD4AF37);
   static const Color errorColor = Color(0xFFDC2626);
 
