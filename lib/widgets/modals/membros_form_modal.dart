@@ -3,9 +3,6 @@ import 'package:flutter_dashboard_3/widgets/custom_dropdown_form_field.dart';
 import 'package:flutter_dashboard_3/widgets/custom_text_form_field.dart';
 import 'package:flutter_dashboard_3/models/membro.dart';
 import 'package:flutter_dashboard_3/services/database_service.dart';
-import 'package:flutter_dashboard_3/widgets/custom_button.dart';
-import 'package:flutter_dashboard_3/widgets/custom_loading.dart';
-import 'package:flutter_dashboard_3/theme.dart';
 
 class MembrosFormModal extends StatefulWidget {
   final Membro? membro; // Null para novo, com dados para edição

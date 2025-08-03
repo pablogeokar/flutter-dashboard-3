@@ -12,7 +12,6 @@ import 'package:flutter_dashboard_3/widgets/card_financeiro.dart';
 import 'package:flutter_dashboard_3/widgets/custom_button.dart';
 import 'package:flutter_dashboard_3/widgets/custom_card.dart';
 import 'package:flutter_dashboard_3/widgets/custom_loading.dart';
-import 'package:flutter_dashboard_3/widgets/status_chip.dart';
 import 'package:flutter_dashboard_3/theme.dart';
 
 class ContribuicoesScreen extends StatefulWidget {
@@ -319,19 +318,6 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
     }
   }
 
-  String _getStatusText(String status) {
-    switch (status) {
-      case 'pago':
-        return 'Pago';
-      case 'pendente':
-        return 'Pendente';
-      case 'cancelado':
-        return 'Cancelado';
-      default:
-        return status;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return CustomLoadingOverlay(
@@ -544,7 +530,6 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
               style: AppTheme.body1.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: AppTheme.spacingXS),
-            StatusChipHelper.contribuicaoStatus(contribuicao.status),
             if (contribuicao.dataPagamento != null) ...[
               const SizedBox(height: AppTheme.spacingXS),
               Text(

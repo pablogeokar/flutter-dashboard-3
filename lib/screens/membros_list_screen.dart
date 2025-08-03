@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dashboard_3/models/membro.dart';
 import 'package:flutter_dashboard_3/services/database_service.dart';
+import 'package:flutter_dashboard_3/widgets/custom_button.dart';
 import 'package:flutter_dashboard_3/widgets/icon_styled.dart';
 import 'package:flutter_dashboard_3/widgets/status_chip.dart';
 import 'package:flutter_dashboard_3/theme.dart';
@@ -307,42 +308,18 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
               ),
               Row(
                 children: [
-                  OutlinedButton.icon(
+                  CustomButton(
+                    text: 'Importar Excel',
+                    variant: ButtonVariant.outline,
+                    icon: Icons.upload_file,
                     onPressed: _abrirImportacaoExcel,
-                    icon: const Icon(Icons.upload_file),
-                    label: const Text('Importar Excel'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF4CAF50),
-                      side: const BorderSide(color: Color(0xFF4CAF50)),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 16,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
                   ),
-                  const SizedBox(width: 16),
-                  ElevatedButton.icon(
+                  const SizedBox(width: AppTheme.spacingM),
+                  CustomButton(
+                    text: 'Adicionar Membro',
+                    variant: ButtonVariant.primary,
+                    icon: Icons.add,
                     onPressed: () => _abrirFormulario(),
-                    icon: const Icon(Icons.person_add),
-                    label: const Text('Novo Membro'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00BCD4),
-                      foregroundColor: Colors.white,
-                      elevation: 4,
-                      shadowColor: const Color(
-                        0xFF00BCD4,
-                      ).withValues(alpha: 0.3),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 16,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
                   ),
                 ],
               ),

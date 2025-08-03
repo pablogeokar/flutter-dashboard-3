@@ -38,24 +38,32 @@ class StatusChip extends StatelessWidget {
         ),
         border: Border.all(color: colors.border, width: 1),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, color: colors.text, size: isSmall ? 12 : 14),
-            SizedBox(width: isSmall ? AppTheme.spacingXS : AppTheme.spacingS),
-          ],
-          Text(
-            label,
-            style: TextStyle(
-              color: colors.text,
-              fontSize: isSmall ? 10 : 12,
-              fontWeight: FontWeight.w500,
+      child: IntrinsicHeight(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (icon != null) ...[
+              Align(
+                alignment: Alignment.center,
+                child: Icon(icon, color: colors.text, size: isSmall ? 12 : 14),
+              ),
+              SizedBox(width: isSmall ? AppTheme.spacingXS : AppTheme.spacingS),
+            ],
+            Align(
+              alignment: Alignment.center,
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: colors.text,
+                  fontSize: isSmall ? 10 : 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
 
