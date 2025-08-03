@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dashboard_3/theme.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_dashboard_3/widgets/main_layout.dart';
+import 'package:flutter_dashboard_3/screens/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.dark,
-      home: const MainLayout(),
+      home: const SplashScreen(),
     );
   }
 }
