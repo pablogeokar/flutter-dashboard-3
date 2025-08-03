@@ -8,6 +8,7 @@ import 'package:flutter_dashboard_3/widgets/custom_card.dart';
 import 'package:flutter_dashboard_3/widgets/custom_loading.dart';
 import 'package:flutter_dashboard_3/theme.dart';
 import 'package:flutter_dashboard_3/utils/responsive_utils.dart';
+import 'package:flutter_dashboard_3/widgets/layout/sidebar/sidebar_header.dart';
 
 class ConfiguracoesScreen extends StatefulWidget {
   const ConfiguracoesScreen({super.key});
@@ -93,11 +94,24 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
       );
 
       _mostrarMensagem('Configurações salvas com sucesso!', Colors.green);
+
+      // Atualizar o header da sidebar se estiver disponível
+      _atualizarSidebarHeader();
     } catch (e) {
       _mostrarMensagem('Erro ao salvar configurações: $e', Colors.red);
     } finally {
       setState(() => _isSaving = false);
     }
+  }
+
+  void _atualizarSidebarHeader() {
+    // Atualizar o header da sidebar usando a GlobalKey
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final sidebarHeaderState = sidebarHeaderKey.currentState;
+      if (sidebarHeaderState != null) {
+        sidebarHeaderState.atualizarInformacoes();
+      }
+    });
   }
 
   void _mostrarMensagem(String mensagem, Color cor) {

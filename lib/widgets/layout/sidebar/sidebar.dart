@@ -28,7 +28,7 @@ class Sidebar extends StatelessWidget {
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SidebarHeader(),
+        SidebarHeader(key: sidebarHeaderKey),
         const CustomDivider(),
         const SizedBox(height: 24),
         SidebarNavigation(

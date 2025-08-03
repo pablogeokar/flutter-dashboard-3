@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dashboard_3/theme.dart';
 
 /// Configuração para uma coluna da tabela
 class DataTableColumn {
@@ -519,17 +520,19 @@ class _DataTableCustomState extends State<DataTableCustom> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: const Color(0xFF00BCD4).withValues(alpha: 0.15),
+            //color: const Color(0xFF00BCD4).withValues(alpha: 0.15),
+            color: AppTheme.primary.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: const Color(0xFF00BCD4).withValues(alpha: 0.3),
+              //color: const Color(0xFF00BCD4).withValues(alpha: 0.3),
+              color: AppTheme.primary.withValues(alpha: 0.3),
             ),
           ),
           child: Text(
             '${_currentPage + 1} de $_totalPages',
             style: const TextStyle(
-              color: Color(0xFF00BCD4),
-              fontWeight: FontWeight.bold,
+              //color: AppTheme.primary,
+              //fontWeight: FontWeight.bold,
               fontSize: 14,
             ),
           ),
