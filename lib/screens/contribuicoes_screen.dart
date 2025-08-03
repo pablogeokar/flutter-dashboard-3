@@ -7,6 +7,7 @@ import 'package:flutter_dashboard_3/services/pdf_service.dart';
 import 'package:flutter_dashboard_3/utils/currency_format.dart';
 import 'package:flutter_dashboard_3/utils/get_nome_sobrenome.dart';
 import 'package:flutter_dashboard_3/widgets/custom_dropdown_form_field.dart';
+import 'package:flutter_dashboard_3/widgets/custom_text_form_field.dart';
 import 'package:flutter_dashboard_3/widgets/modals/contribuicao_form_modal.dart';
 import 'package:flutter_dashboard_3/widgets/card_financeiro.dart';
 import 'package:flutter_dashboard_3/widgets/custom_button.dart';
@@ -23,11 +24,16 @@ class ContribuicoesScreen extends StatefulWidget {
 
 class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
   List<Contribuicao> _contribuicoes = [];
+  List<Contribuicao> _contribuicoesFiltradas = [];
   Map<String, dynamic> _estatisticas = {};
   bool _isLoading = true;
+  String _filtroMembro = '';
 
   int _mesReferencia = DateTime.now().month;
   int _anoReferencia = DateTime.now().year;
+
+  // Controlador para o campo de busca por membro
+  final TextEditingController _membroController = TextEditingController();
 
   final List<String> _meses = [
     '',
@@ -49,6 +55,18 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
   void initState() {
     super.initState();
     _carregarDados();
+
+    // Listener para o campo de busca por membro
+    _membroController.addListener(() {
+      _filtroMembro = _membroController.text;
+      _aplicarFiltros();
+    });
+  }
+
+  @override
+  void dispose() {
+    _membroController.dispose();
+    super.dispose();
   }
 
   Future<void> _carregarDados() async {
@@ -70,12 +88,26 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
       setState(() {
         _contribuicoes = contribuicoes;
         _estatisticas = estatisticas;
+        _aplicarFiltros();
       });
     } catch (e) {
       _mostrarMensagem('Erro ao carregar dados: $e', Colors.red);
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  void _aplicarFiltros() {
+    setState(() {
+      _contribuicoesFiltradas = _contribuicoes.where((contribuicao) {
+        final matchMembro =
+            _filtroMembro.isEmpty ||
+            (contribuicao.membroNome ?? '').toLowerCase().contains(
+              _filtroMembro.toLowerCase(),
+            );
+        return matchMembro;
+      }).toList();
+    });
   }
 
   Future<void> _gerarContribuicoes() async {
@@ -412,6 +444,15 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
             ),
             const SizedBox(height: AppTheme.spacingM),
 
+            // Campo de busca por membro
+            CustomTextFormField(
+              controller: _membroController,
+              label: 'Buscar por membro',
+              hintText: 'Digite o nome do membro...',
+              prefixIcon: Icons.search,
+            ),
+            const SizedBox(height: AppTheme.spacingM),
+
             // Estatísticas
             if (_estatisticas.isNotEmpty) _buildEstatisticasCards(),
           ],
@@ -492,11 +533,37 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
   }
 
   Widget _buildContribuicoesList() {
+    final contribuicoesParaExibir =
+        _contribuicoesFiltradas.isNotEmpty || _filtroMembro.isNotEmpty
+        ? _contribuicoesFiltradas
+        : _contribuicoes;
+
+    if (contribuicoesParaExibir.isEmpty && _filtroMembro.isNotEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
+            const SizedBox(height: AppTheme.spacingM),
+            Text(
+              'Nenhum membro encontrado',
+              style: AppTheme.headline4.copyWith(color: Colors.grey[600]),
+            ),
+            const SizedBox(height: AppTheme.spacingS),
+            Text(
+              'Tente ajustar o filtro de busca',
+              style: AppTheme.body2.copyWith(color: Colors.grey[500]),
+            ),
+          ],
+        ),
+      );
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: _contribuicoes.length,
+      itemCount: contribuicoesParaExibir.length,
       itemBuilder: (context, index) {
-        final contribuicao = _contribuicoes[index];
+        final contribuicao = contribuicoesParaExibir[index];
         return _buildContribuicaoCard(contribuicao);
       },
     );
