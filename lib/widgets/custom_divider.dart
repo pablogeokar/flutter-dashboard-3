@@ -9,8 +9,8 @@ class CustomDivider extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      height: 1,
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      height: 2,
       decoration: BoxDecoration(
         gradient: isDark
             ? null

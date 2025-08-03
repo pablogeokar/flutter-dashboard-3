@@ -14,6 +14,7 @@ import 'package:flutter_dashboard_3/widgets/custom_button.dart';
 import 'package:flutter_dashboard_3/widgets/custom_card.dart';
 import 'package:flutter_dashboard_3/widgets/custom_loading.dart';
 import 'package:flutter_dashboard_3/theme.dart';
+import 'package:flutter_dashboard_3/utils/responsive_utils.dart';
 
 class ContribuicoesScreen extends StatefulWidget {
   const ContribuicoesScreen({super.key});
@@ -381,57 +382,122 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
   }
 
   Widget _buildHeaderSection() {
+    final isSmall = ResponsiveUtils.isSmallScreen(context);
+
     return CustomCard(
       variant: CardVariant.outlined,
-      margin: const EdgeInsets.all(AppTheme.spacingL),
+      margin: ResponsiveUtils.getResponsiveMargin(
+        context,
+        all: AppTheme.spacingL,
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(AppTheme.spacingM),
+        padding: EdgeInsets.all(
+          ResponsiveUtils.getResponsiveSpacing(context, AppTheme.spacingXS),
+        ),
         child: Column(
           children: [
             // Seletor de período
-            Row(
-              children: [
-                Expanded(
-                  child: CustomDropdownFormField(
-                    value: _meses[_mesReferencia],
-                    label: 'Mês',
-                    items: _meses.sublist(1), // Remove o item vazio do início
-                    onChanged: (valor) {
-                      if (valor != null) {
-                        final novoMes = _meses.indexOf(valor);
-                        if (novoMes != _mesReferencia) {
-                          setState(() => _mesReferencia = novoMes);
-                          _carregarDados();
-                        }
-                      }
-                    },
-                    prefixIcon: Icons.calendar_today,
+            isSmall
+                ? Column(
+                    children: [
+                      CustomDropdownFormField(
+                        value: _meses[_mesReferencia],
+                        label: 'Mês',
+                        items: _meses.sublist(
+                          1,
+                        ), // Remove o item vazio do início
+                        onChanged: (valor) {
+                          if (valor != null) {
+                            final novoMes = _meses.indexOf(valor);
+                            if (novoMes != _mesReferencia) {
+                              setState(() => _mesReferencia = novoMes);
+                              _carregarDados();
+                            }
+                          }
+                        },
+                        prefixIcon: Icons.calendar_today,
+                      ),
+                      SizedBox(
+                        height: ResponsiveUtils.getResponsiveSpacing(
+                          context,
+                          AppTheme.spacingM,
+                        ),
+                      ),
+                      CustomDropdownFormField(
+                        value: _anoReferencia.toString(),
+                        label: 'Ano',
+                        items: List.generate(10, (index) {
+                          final ano = DateTime.now().year - 5 + index;
+                          return ano.toString();
+                        }),
+                        onChanged: (valor) {
+                          if (valor != null) {
+                            final novoAno = int.parse(valor);
+                            if (novoAno != _anoReferencia) {
+                              setState(() => _anoReferencia = novoAno);
+                              _carregarDados();
+                            }
+                          }
+                        },
+                        prefixIcon: Icons.calendar_view_month,
+                      ),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Expanded(
+                        child: CustomDropdownFormField(
+                          value: _meses[_mesReferencia],
+                          label: 'Mês',
+                          items: _meses.sublist(
+                            1,
+                          ), // Remove o item vazio do início
+                          onChanged: (valor) {
+                            if (valor != null) {
+                              final novoMes = _meses.indexOf(valor);
+                              if (novoMes != _mesReferencia) {
+                                setState(() => _mesReferencia = novoMes);
+                                _carregarDados();
+                              }
+                            }
+                          },
+                          prefixIcon: Icons.calendar_today,
+                        ),
+                      ),
+                      SizedBox(
+                        width: ResponsiveUtils.getResponsiveSpacing(
+                          context,
+                          AppTheme.spacingM,
+                        ),
+                      ),
+                      Expanded(
+                        child: CustomDropdownFormField(
+                          value: _anoReferencia.toString(),
+                          label: 'Ano',
+                          items: List.generate(10, (index) {
+                            final ano = DateTime.now().year - 5 + index;
+                            return ano.toString();
+                          }),
+                          onChanged: (valor) {
+                            if (valor != null) {
+                              final novoAno = int.parse(valor);
+                              if (novoAno != _anoReferencia) {
+                                setState(() => _anoReferencia = novoAno);
+                                _carregarDados();
+                              }
+                            }
+                          },
+                          prefixIcon: Icons.calendar_view_month,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: AppTheme.spacingM),
-                Expanded(
-                  child: CustomDropdownFormField(
-                    value: _anoReferencia.toString(),
-                    label: 'Ano',
-                    items: List.generate(10, (index) {
-                      final ano = DateTime.now().year - 5 + index;
-                      return ano.toString();
-                    }),
-                    onChanged: (valor) {
-                      if (valor != null) {
-                        final novoAno = int.parse(valor);
-                        if (novoAno != _anoReferencia) {
-                          setState(() => _anoReferencia = novoAno);
-                          _carregarDados();
-                        }
-                      }
-                    },
-                    prefixIcon: Icons.calendar_view_month,
-                  ),
-                ),
-              ],
+            SizedBox(
+              height: ResponsiveUtils.getResponsiveSpacing(
+                context,
+                AppTheme.spacingM,
+              ),
             ),
-            const SizedBox(height: AppTheme.spacingM),
 
             // Campo de busca por membro
             FilterWidget(
@@ -446,7 +512,12 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
               padding: EdgeInsets.zero,
               decoration: const BoxDecoration(),
             ),
-            const SizedBox(height: AppTheme.spacingM),
+            SizedBox(
+              height: ResponsiveUtils.getResponsiveSpacing(
+                context,
+                AppTheme.spacingM,
+              ),
+            ),
 
             // Estatísticas
             if (_estatisticas.isNotEmpty) _buildEstatisticasCards(),
@@ -459,40 +530,73 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
   Widget _buildEstatisticasCards() {
     final totalGeral = _estatisticas['total_geral'] ?? {};
     final porStatus = _estatisticas['por_status'] ?? {};
+    final isSmall = ResponsiveUtils.isSmallScreen(context);
 
-    return Row(
-      children: [
-        Expanded(
-          child: CardFinanceiro(
-            titulo: 'Total',
-            valor:
-                '${totalGeral['quantidade'] ?? 0}\nR\$ ${(totalGeral['valor_total'] ?? 0.0).toStringAsFixed(2)}',
-            icone: Icons.monetization_on,
-            cor: Colors.blue,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: CardFinanceiro(
-            titulo: 'Pagas',
-            valor:
-                '${porStatus['pago']?['quantidade'] ?? 0}\nR\$ ${(porStatus['pago']?['valor_total'] ?? 0.0).toStringAsFixed(2)}',
-            icone: Icons.check_circle,
-            cor: Colors.green,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: CardFinanceiro(
-            titulo: 'Pendentes',
-            valor:
-                '${porStatus['pendente']?['quantidade'] ?? 0}\nR\$ ${(porStatus['pendente']?['valor_total'] ?? 0.0).toStringAsFixed(2)}',
-            icone: Icons.schedule,
-            cor: Colors.orange,
-          ),
-        ),
-      ],
-    );
+    return isSmall
+        ? Column(
+            children: [
+              CardFinanceiro(
+                titulo: 'Total',
+                valor:
+                    '${totalGeral['quantidade'] ?? 0}\nR\$ ${(totalGeral['valor_total'] ?? 0.0).toStringAsFixed(2)}',
+                icone: Icons.monetization_on,
+                cor: Colors.blue,
+              ),
+              SizedBox(
+                height: ResponsiveUtils.getResponsiveSpacing(context, 8),
+              ),
+              CardFinanceiro(
+                titulo: 'Pagas',
+                valor:
+                    '${porStatus['pago']?['quantidade'] ?? 0}\nR\$ ${(porStatus['pago']?['valor_total'] ?? 0.0).toStringAsFixed(2)}',
+                icone: Icons.check_circle,
+                cor: Colors.green,
+              ),
+              SizedBox(
+                height: ResponsiveUtils.getResponsiveSpacing(context, 8),
+              ),
+              CardFinanceiro(
+                titulo: 'Pendentes',
+                valor:
+                    '${porStatus['pendente']?['quantidade'] ?? 0}\nR\$ ${(porStatus['pendente']?['valor_total'] ?? 0.0).toStringAsFixed(2)}',
+                icone: Icons.schedule,
+                cor: Colors.orange,
+              ),
+            ],
+          )
+        : Row(
+            children: [
+              Expanded(
+                child: CardFinanceiro(
+                  titulo: 'Total',
+                  valor:
+                      '${totalGeral['quantidade'] ?? 0}\nR\$ ${(totalGeral['valor_total'] ?? 0.0).toStringAsFixed(2)}',
+                  icone: Icons.monetization_on,
+                  cor: Colors.blue,
+                ),
+              ),
+              SizedBox(width: ResponsiveUtils.getResponsiveSpacing(context, 8)),
+              Expanded(
+                child: CardFinanceiro(
+                  titulo: 'Pagas',
+                  valor:
+                      '${porStatus['pago']?['quantidade'] ?? 0}\nR\$ ${(porStatus['pago']?['valor_total'] ?? 0.0).toStringAsFixed(2)}',
+                  icone: Icons.check_circle,
+                  cor: Colors.green,
+                ),
+              ),
+              SizedBox(width: ResponsiveUtils.getResponsiveSpacing(context, 8)),
+              Expanded(
+                child: CardFinanceiro(
+                  titulo: 'Pendentes',
+                  valor:
+                      '${porStatus['pendente']?['quantidade'] ?? 0}\nR\$ ${(porStatus['pendente']?['valor_total'] ?? 0.0).toStringAsFixed(2)}',
+                  icone: Icons.schedule,
+                  cor: Colors.orange,
+                ),
+              ),
+            ],
+          );
   }
 
   Widget _buildEmptyState() {
@@ -502,20 +606,39 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
         children: [
           Icon(
             Icons.monetization_on_outlined,
-            size: 64,
+            size: ResponsiveUtils.getResponsiveIconSize(context, 64),
             color: Colors.grey[400],
           ),
-          const SizedBox(height: AppTheme.spacingM),
+          SizedBox(
+            height: ResponsiveUtils.getResponsiveSpacing(
+              context,
+              AppTheme.spacingM,
+            ),
+          ),
           Text(
             'Nenhuma contribuição encontrada',
-            style: AppTheme.headline4.copyWith(color: Colors.grey[600]),
+            style: AppTheme.getResponsiveHeadline4(
+              context,
+            ).copyWith(color: Colors.grey[600]),
           ),
-          const SizedBox(height: AppTheme.spacingS),
+          SizedBox(
+            height: ResponsiveUtils.getResponsiveSpacing(
+              context,
+              AppTheme.spacingS,
+            ),
+          ),
           Text(
             'para ${_meses[_mesReferencia]}/$_anoReferencia',
-            style: AppTheme.body2.copyWith(color: Colors.grey[500]),
+            style: AppTheme.getResponsiveBody2(
+              context,
+            ).copyWith(color: Colors.grey[500]),
           ),
-          const SizedBox(height: AppTheme.spacingL),
+          SizedBox(
+            height: ResponsiveUtils.getResponsiveSpacing(
+              context,
+              AppTheme.spacingL,
+            ),
+          ),
           CustomButton(
             text: 'Gerar Contribuições',
             variant: ButtonVariant.primary,
@@ -555,7 +678,11 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: ResponsiveUtils.getResponsivePadding(
+        context,
+        horizontal: 16,
+        vertical: 16,
+      ),
       itemCount: contribuicoesParaExibir.length,
       itemBuilder: (context, index) {
         final contribuicao = contribuicoesParaExibir[index];
@@ -567,10 +694,16 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
   Widget _buildContribuicaoCard(Contribuicao contribuicao) {
     return CustomCard(
       variant: CardVariant.default_,
-      margin: const EdgeInsets.only(bottom: AppTheme.spacingS),
+      margin: EdgeInsets.only(
+        bottom: ResponsiveUtils.getResponsiveSpacing(
+          context,
+          AppTheme.spacingS,
+        ),
+      ),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: _getStatusColor(contribuicao.status),
+          radius: ResponsiveUtils.getResponsiveRadius(context, 20),
           child: Icon(
             contribuicao.isPago
                 ? Icons.check
@@ -578,35 +711,55 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
                 ? Icons.close
                 : Icons.schedule,
             color: Colors.white,
+            size: ResponsiveUtils.getResponsiveIconSize(context, 20),
           ),
         ),
         title: Text(
           contribuicao.membroNome ?? 'Membro não encontrado',
-          style: AppTheme.headline4,
+          style: AppTheme.getResponsiveHeadline4(context),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               currencyFormat.format(contribuicao.valor),
-              style: AppTheme.body1.copyWith(fontWeight: FontWeight.w600),
+              style: AppTheme.getResponsiveBody1(
+                context,
+              ).copyWith(fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: AppTheme.spacingXS),
+            SizedBox(
+              height: ResponsiveUtils.getResponsiveSpacing(
+                context,
+                AppTheme.spacingXS,
+              ),
+            ),
             if (contribuicao.dataPagamento != null) ...[
-              const SizedBox(height: AppTheme.spacingXS),
+              SizedBox(
+                height: ResponsiveUtils.getResponsiveSpacing(
+                  context,
+                  AppTheme.spacingXS,
+                ),
+              ),
               Text(
                 'Pago em: ${contribuicao.dataPagamento!.day.toString().padLeft(2, '0')}/'
                 '${contribuicao.dataPagamento!.month.toString().padLeft(2, '0')}/'
                 '${contribuicao.dataPagamento!.year}',
-                style: AppTheme.caption.copyWith(color: Colors.grey[600]),
+                style: AppTheme.getResponsiveCaption(
+                  context,
+                ).copyWith(color: Colors.grey[600]),
               ),
             ],
             if (contribuicao.observacoes != null &&
                 contribuicao.observacoes!.isNotEmpty) ...[
-              const SizedBox(height: AppTheme.spacingXS),
+              SizedBox(
+                height: ResponsiveUtils.getResponsiveSpacing(
+                  context,
+                  AppTheme.spacingXS,
+                ),
+              ),
               Text(
                 'Obs: ${contribuicao.observacoes}',
-                style: AppTheme.caption.copyWith(
+                style: AppTheme.getResponsiveCaption(context).copyWith(
                   color: Colors.grey[600],
                   fontStyle: FontStyle.italic,
                 ),
@@ -635,55 +788,80 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
             }
           },
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'editar',
               child: Row(
                 children: [
                   Icon(Icons.edit, color: Colors.blue),
-                  SizedBox(width: AppTheme.spacingS),
+                  SizedBox(
+                    width: ResponsiveUtils.getResponsiveSpacing(
+                      context,
+                      AppTheme.spacingS,
+                    ),
+                  ),
                   Text('Editar'),
                 ],
               ),
             ),
             if (contribuicao.isPago) ...[
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'visualizar',
                 child: Row(
                   children: [
                     Icon(Icons.preview, color: Colors.blue),
-                    SizedBox(width: AppTheme.spacingS),
+                    SizedBox(
+                      width: ResponsiveUtils.getResponsiveSpacing(
+                        context,
+                        AppTheme.spacingS,
+                      ),
+                    ),
                     Text('Visualizar Recibo'),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'imprimir',
                 child: Row(
                   children: [
                     Icon(Icons.print, color: Colors.blue),
-                    SizedBox(width: AppTheme.spacingS),
+                    SizedBox(
+                      width: ResponsiveUtils.getResponsiveSpacing(
+                        context,
+                        AppTheme.spacingS,
+                      ),
+                    ),
                     Text('Imprimir Recibo'),
                   ],
                 ),
               ),
             ],
             if (contribuicao.isPendente) ...[
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'pagar',
                 child: Row(
                   children: [
                     Icon(Icons.check, color: Colors.green),
-                    SizedBox(width: AppTheme.spacingS),
+                    SizedBox(
+                      width: ResponsiveUtils.getResponsiveSpacing(
+                        context,
+                        AppTheme.spacingS,
+                      ),
+                    ),
                     Text('Marcar como Pago'),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'cancelar',
                 child: Row(
                   children: [
                     Icon(Icons.close, color: Colors.red),
-                    SizedBox(width: AppTheme.spacingS),
+                    SizedBox(
+                      width: ResponsiveUtils.getResponsiveSpacing(
+                        context,
+                        AppTheme.spacingS,
+                      ),
+                    ),
                     Text('Cancelar'),
                   ],
                 ),

@@ -9,6 +9,7 @@ import '../widgets/modals/membros_form_modal.dart';
 import '../widgets/modals/excel_import_modal.dart';
 import '../widgets/data_table_custom.dart';
 import '../widgets/filter_widget.dart';
+import 'package:flutter_dashboard_3/utils/responsive_utils.dart';
 
 class MembrosListScreen extends StatefulWidget {
   const MembrosListScreen({super.key});
@@ -31,29 +32,66 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
   ];
 
   // Definição das colunas para o novo DataTableCustom
-  List<DataTableColumn> get _tableColumns => [
-    const DataTableColumn(key: 'nome', label: 'Nome', width: 360),
-    const DataTableColumn(key: 'email', label: 'E-mail', width: 200),
-    const DataTableColumn(key: 'telefone', label: 'Telefone', width: 140),
-    DataTableColumn(
-      key: 'status',
-      label: 'Status',
-      width: 110,
-      cellBuilder: (value) => _buildStatusChip(value?.toString() ?? 'N/A'),
-    ),
-    DataTableColumn(
-      key: 'acoes',
-      label: 'Ações',
-      width: 110,
-      cellBuilder: (value) {
-        // O value aqui será o próprio objeto Membro
-        if (value is Membro) {
-          return _buildActionsButtons(value);
-        }
-        return const SizedBox();
-      },
-    ),
-  ];
+  List<DataTableColumn> get _tableColumns {
+    final isSmall = ResponsiveUtils.isSmallScreen(context);
+    final isMedium = ResponsiveUtils.isMediumScreen(context);
+
+    return [
+      DataTableColumn(
+        key: 'nome',
+        label: 'Nome',
+        width: isSmall
+            ? 280
+            : isMedium
+            ? 320
+            : 360,
+      ),
+      DataTableColumn(
+        key: 'email',
+        label: 'E-mail',
+        width: isSmall
+            ? 160
+            : isMedium
+            ? 180
+            : 200,
+      ),
+      DataTableColumn(
+        key: 'telefone',
+        label: 'Telefone',
+        width: isSmall
+            ? 120
+            : isMedium
+            ? 130
+            : 140,
+      ),
+      DataTableColumn(
+        key: 'status',
+        label: 'Status',
+        width: isSmall
+            ? 90
+            : isMedium
+            ? 100
+            : 110,
+        cellBuilder: (value) => _buildStatusChip(value?.toString() ?? 'N/A'),
+      ),
+      DataTableColumn(
+        key: 'acoes',
+        label: 'Ações',
+        width: isSmall
+            ? 90
+            : isMedium
+            ? 100
+            : 110,
+        cellBuilder: (value) {
+          // O value aqui será o próprio objeto Membro
+          if (value is Membro) {
+            return _buildActionsButtons(value);
+          }
+          return const SizedBox();
+        },
+      ),
+    ];
+  }
 
   @override
   void initState() {
@@ -200,24 +238,38 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
   }
 
   Widget _buildActionsButtons(Membro membro) {
+    final iconSize = ResponsiveUtils.getResponsiveIconSize(context, 20);
+    final buttonSize = ResponsiveUtils.isSmallScreen(context) ? 32.0 : 36.0;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
           onPressed: () => _abrirFormulario(membro: membro),
-          icon: const Icon(Icons.edit, color: AppTheme.primaryColor),
+          icon: Icon(Icons.edit, color: AppTheme.primaryColor),
           tooltip: 'Editar',
-          iconSize: 20,
-          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+          iconSize: iconSize,
+          constraints: BoxConstraints(
+            minWidth: buttonSize,
+            minHeight: buttonSize,
+          ),
           padding: EdgeInsets.zero,
         ),
-        const SizedBox(width: AppTheme.spacingXS),
+        SizedBox(
+          width: ResponsiveUtils.getResponsiveSpacing(
+            context,
+            AppTheme.spacingXS,
+          ),
+        ),
         IconButton(
           onPressed: () => _confirmarExclusao(membro),
-          icon: const Icon(Icons.delete, color: AppTheme.error),
+          icon: Icon(Icons.delete, color: AppTheme.error),
           tooltip: 'Excluir',
-          iconSize: 20,
-          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+          iconSize: iconSize,
+          constraints: BoxConstraints(
+            minWidth: buttonSize,
+            minHeight: buttonSize,
+          ),
           padding: EdgeInsets.zero,
         ),
       ],
@@ -241,9 +293,12 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    final isSmall = ResponsiveUtils.isSmallScreen(context);
 
     return Container(
-      padding: const EdgeInsets.all(24.0),
+      padding: EdgeInsets.all(
+        ResponsiveUtils.getResponsiveSpacing(context, 24.0),
+      ),
       decoration: BoxDecoration(
         gradient: isDark
             ? const LinearGradient(
@@ -259,8 +314,9 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-        borderRadius: BorderRadius.circular(16),
-        //border: Border.all(color: colorScheme.outline, width: 1),
+        borderRadius: BorderRadius.circular(
+          ResponsiveUtils.getResponsiveRadius(context, 16),
+        ),
         border: Border.all(color: const Color(0xFF424242), width: 1),
         boxShadow: [
           BoxShadow(
@@ -273,51 +329,114 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  IconStyled(icone: Icons.people),
-                  const SizedBox(width: 16),
-                  Text(
-                    'Gerenciamento de Irmãos',
-                    style: TextStyle(
-                      fontSize: 22,
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
+          isSmall
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        IconStyled(icone: Icons.people),
+                        SizedBox(
+                          width: ResponsiveUtils.getResponsiveSpacing(
+                            context,
+                            16,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Gerenciamento de Irmãos',
+                            style: AppTheme.getResponsiveHeadline3(context)
+                                .copyWith(
+                                  color: colorScheme.onSurface,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  CustomButton(
-                    text: 'Importar Excel',
-                    variant: ButtonVariant.outline,
-                    icon: Icons.upload_file,
-                    onPressed: _abrirImportacaoExcel,
-                  ),
-                  const SizedBox(width: AppTheme.spacingM),
-                  CustomButton(
-                    text: 'Adicionar Membro',
-                    variant: ButtonVariant.primary,
-                    icon: Icons.add,
-                    onPressed: () => _abrirFormulario(),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
+                    SizedBox(
+                      height: ResponsiveUtils.getResponsiveSpacing(context, 16),
+                    ),
+                    Column(
+                      children: [
+                        CustomButton(
+                          text: 'Importar Excel',
+                          variant: ButtonVariant.outline,
+                          icon: Icons.upload_file,
+                          onPressed: _abrirImportacaoExcel,
+                        ),
+                        SizedBox(
+                          height: ResponsiveUtils.getResponsiveSpacing(
+                            context,
+                            AppTheme.spacingS,
+                          ),
+                        ),
+                        CustomButton(
+                          text: 'Adicionar Membro',
+                          variant: ButtonVariant.primary,
+                          icon: Icons.add,
+                          onPressed: () => _abrirFormulario(),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        IconStyled(icone: Icons.people),
+                        SizedBox(
+                          width: ResponsiveUtils.getResponsiveSpacing(
+                            context,
+                            16,
+                          ),
+                        ),
+                        Text(
+                          'Gerenciamento de Irmãos',
+                          style: AppTheme.getResponsiveHeadline3(context)
+                              .copyWith(
+                                color: colorScheme.onSurface,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        CustomButton(
+                          text: 'Importar Excel',
+                          variant: ButtonVariant.outline,
+                          icon: Icons.upload_file,
+                          onPressed: _abrirImportacaoExcel,
+                        ),
+                        SizedBox(
+                          width: ResponsiveUtils.getResponsiveSpacing(
+                            context,
+                            AppTheme.spacingM,
+                          ),
+                        ),
+                        CustomButton(
+                          text: 'Adicionar Membro',
+                          variant: ButtonVariant.primary,
+                          icon: Icons.add,
+                          onPressed: () => _abrirFormulario(),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+          SizedBox(height: ResponsiveUtils.getResponsiveSpacing(context, 24)),
           FilterWidget(
             filters: [
               CommonFilters.textSearch(
                 key: 'nome',
                 label: 'Buscar por nome',
                 hintText: 'Buscar por nome...',
-                flex: 2,
+                flex: isSmall ? 1 : 2,
               ),
               CommonFilters.statusDropdown(
                 key: 'status',
@@ -364,35 +483,50 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
           ? const Color(0xFF0F0F0F)
           : colorScheme.surfaceContainerLowest,
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: ResponsiveUtils.getResponsivePadding(
+          context,
+          horizontal: 16.0,
+          vertical: 16.0,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildHeader(),
-            const SizedBox(height: 24),
+            SizedBox(height: ResponsiveUtils.getResponsiveSpacing(context, 24)),
             Expanded(
               child: _isLoading
                   ? Center(
                       child: CircularProgressIndicator(
                         color: const Color(0xFF00BCD4),
-                        strokeWidth: 3,
+                        strokeWidth: ResponsiveUtils.isSmallScreen(context)
+                            ? 2
+                            : 3,
                       ),
                     )
                   : DataTableCustom(
                       columns: _tableColumns,
                       data: _prepararDadosTabela(),
                       totalLabel: 'Total: ${_membrosFiltrados.length} membros',
-                      leadingIcon: const Icon(
+                      leadingIcon: Icon(
                         Icons.view_list,
-                        color: Color(0xFF00BCD4),
+                        color: const Color(0xFF00BCD4),
+                        size: ResponsiveUtils.getResponsiveIconSize(
+                          context,
+                          24,
+                        ),
                       ),
                       emptyMessage:
                           'Nenhum membro foi encontrado.\nTente ajustar os filtros ou adicionar novos membros.',
                       theme: tableTheme,
                       // Configurações de paginação
                       enablePagination: true,
-                      itemsPerPage: 10,
-                      itemsPerPageOptions: const [5, 10, 20, 50],
+                      itemsPerPage: ResponsiveUtils.isSmallScreen(context)
+                          ? 8
+                          : 10,
+                      itemsPerPageOptions:
+                          ResponsiveUtils.isSmallScreen(context)
+                          ? const [5, 8, 15, 30]
+                          : const [5, 10, 20, 50],
                       // Configurações de responsividade
                       enableHorizontalScroll: true,
                     ),

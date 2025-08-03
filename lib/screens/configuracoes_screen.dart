@@ -7,6 +7,7 @@ import 'package:flutter_dashboard_3/widgets/custom_button.dart';
 import 'package:flutter_dashboard_3/widgets/custom_card.dart';
 import 'package:flutter_dashboard_3/widgets/custom_loading.dart';
 import 'package:flutter_dashboard_3/theme.dart';
+import 'package:flutter_dashboard_3/utils/responsive_utils.dart';
 
 class ConfiguracoesScreen extends StatefulWidget {
   const ConfiguracoesScreen({super.key});
@@ -142,7 +143,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
           ],
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppTheme.spacingL),
+          padding: ResponsiveUtils.getResponsivePadding(context),
           child: Form(
             key: _formKey,
             child: Column(
@@ -165,7 +166,12 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: AppTheme.spacingM),
+                    SizedBox(
+                      height: ResponsiveUtils.getResponsiveSpacing(
+                        context,
+                        AppTheme.spacingM,
+                      ),
+                    ),
                     CustomTextFormField(
                       controller: _cnpjController,
                       label: 'CNPJ',
@@ -181,7 +187,12 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                   ],
                 ),
 
-                const SizedBox(height: AppTheme.spacingL),
+                SizedBox(
+                  height: ResponsiveUtils.getResponsiveSpacing(
+                    context,
+                    AppTheme.spacingL,
+                  ),
+                ),
 
                 // Card de Configurações Financeiras
                 _buildSectionCard(
@@ -214,12 +225,27 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: AppTheme.spacingM),
+                    SizedBox(
+                      height: ResponsiveUtils.getResponsiveSpacing(
+                        context,
+                        AppTheme.spacingM,
+                      ),
+                    ),
                     Container(
-                      padding: const EdgeInsets.all(AppTheme.spacingM),
+                      padding: EdgeInsets.all(
+                        ResponsiveUtils.getResponsiveSpacing(
+                          context,
+                          AppTheme.spacingM,
+                        ),
+                      ),
                       decoration: BoxDecoration(
                         color: AppTheme.info.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusM),
+                        borderRadius: BorderRadius.circular(
+                          ResponsiveUtils.getResponsiveRadius(
+                            context,
+                            AppTheme.radiusM,
+                          ),
+                        ),
                         border: Border.all(
                           color: AppTheme.info.withValues(alpha: 0.3),
                         ),
@@ -227,13 +253,18 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                       child: Row(
                         children: [
                           Icon(Icons.info_outline, color: AppTheme.info),
-                          const SizedBox(width: AppTheme.spacingS),
+                          SizedBox(
+                            width: ResponsiveUtils.getResponsiveSpacing(
+                              context,
+                              AppTheme.spacingS,
+                            ),
+                          ),
                           Expanded(
                             child: Text(
                               'Este valor será usado como padrão ao gerar as contribuições mensais para todos os membros ativos.',
-                              style: AppTheme.body2.copyWith(
-                                color: AppTheme.info,
-                              ),
+                              style: AppTheme.getResponsiveBody2(
+                                context,
+                              ).copyWith(color: AppTheme.info),
                             ),
                           ),
                         ],
@@ -242,31 +273,71 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                   ],
                 ),
 
-                const SizedBox(height: AppTheme.spacingXL),
+                SizedBox(
+                  height: ResponsiveUtils.getResponsiveSpacing(
+                    context,
+                    AppTheme.spacingXL,
+                  ),
+                ),
 
                 // Botões de ação
-                Row(
-                  children: [
-                    Expanded(
-                      child: CustomButton(
-                        text: 'Recarregar',
-                        variant: ButtonVariant.outline,
-                        icon: Icons.refresh,
-                        onPressed: _isSaving ? null : _carregarConfiguracoes,
+                ResponsiveUtils.isSmallScreen(context)
+                    ? Column(
+                        children: [
+                          CustomButton(
+                            text: 'Recarregar',
+                            variant: ButtonVariant.outline,
+                            icon: Icons.refresh,
+                            onPressed: _isSaving
+                                ? null
+                                : _carregarConfiguracoes,
+                          ),
+                          SizedBox(
+                            height: ResponsiveUtils.getResponsiveSpacing(
+                              context,
+                              AppTheme.spacingM,
+                            ),
+                          ),
+                          CustomButton(
+                            text: _isSaving ? 'Salvando...' : 'Salvar',
+                            variant: ButtonVariant.primary,
+                            icon: Icons.save,
+                            isLoading: _isSaving,
+                            onPressed: _isSaving ? null : _salvarConfiguracoes,
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          Expanded(
+                            child: CustomButton(
+                              text: 'Recarregar',
+                              variant: ButtonVariant.outline,
+                              icon: Icons.refresh,
+                              onPressed: _isSaving
+                                  ? null
+                                  : _carregarConfiguracoes,
+                            ),
+                          ),
+                          SizedBox(
+                            width: ResponsiveUtils.getResponsiveSpacing(
+                              context,
+                              AppTheme.spacingM,
+                            ),
+                          ),
+                          Expanded(
+                            child: CustomButton(
+                              text: _isSaving ? 'Salvando...' : 'Salvar',
+                              variant: ButtonVariant.primary,
+                              icon: Icons.save,
+                              isLoading: _isSaving,
+                              onPressed: _isSaving
+                                  ? null
+                                  : _salvarConfiguracoes,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: AppTheme.spacingM),
-                    Expanded(
-                      child: CustomButton(
-                        text: _isSaving ? 'Salvando...' : 'Salvar',
-                        variant: ButtonVariant.primary,
-                        icon: Icons.save,
-                        isLoading: _isSaving,
-                        onPressed: _isSaving ? null : _salvarConfiguracoes,
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
@@ -282,25 +353,46 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
   }) {
     return CustomCard(
       variant: CardVariant.default_,
-      margin: const EdgeInsets.only(bottom: AppTheme.spacingL),
+      margin: EdgeInsets.only(
+        bottom: ResponsiveUtils.getResponsiveSpacing(
+          context,
+          AppTheme.spacingL,
+        ),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(AppTheme.spacingL),
+        padding: EdgeInsets.all(
+          ResponsiveUtils.getResponsiveSpacing(context, AppTheme.spacingL),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(icon, color: AppTheme.primaryColor, size: 28),
-                const SizedBox(width: AppTheme.spacingS),
+                Icon(
+                  icon,
+                  color: AppTheme.primaryColor,
+                  size: ResponsiveUtils.getResponsiveIconSize(context, 28),
+                ),
+                SizedBox(
+                  width: ResponsiveUtils.getResponsiveSpacing(
+                    context,
+                    AppTheme.spacingS,
+                  ),
+                ),
                 Text(
                   title,
-                  style: AppTheme.headline3.copyWith(
-                    color: AppTheme.primaryColor,
-                  ),
+                  style: AppTheme.getResponsiveHeadline3(
+                    context,
+                  ).copyWith(color: AppTheme.primaryColor),
                 ),
               ],
             ),
-            const SizedBox(height: AppTheme.spacingL),
+            SizedBox(
+              height: ResponsiveUtils.getResponsiveSpacing(
+                context,
+                AppTheme.spacingL,
+              ),
+            ),
             ...children,
           ],
         ),

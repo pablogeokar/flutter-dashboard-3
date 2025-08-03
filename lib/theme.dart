@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dashboard_3/utils/responsive_utils.dart';
 
 class AppTheme {
   // Cores principais
@@ -142,6 +143,55 @@ class AppTheme {
     fontWeight: FontWeight.w500,
     letterSpacing: 0.5,
   );
+
+  // Tipografia responsiva
+  static TextStyle getResponsiveHeadline1(BuildContext context) {
+    return headline1.copyWith(
+      fontSize: ResponsiveUtils.getResponsiveFontSize(context, 32),
+    );
+  }
+
+  static TextStyle getResponsiveHeadline2(BuildContext context) {
+    return headline2.copyWith(
+      fontSize: ResponsiveUtils.getResponsiveFontSize(context, 24),
+    );
+  }
+
+  static TextStyle getResponsiveHeadline3(BuildContext context) {
+    return headline3.copyWith(
+      fontSize: ResponsiveUtils.getResponsiveFontSize(context, 20),
+    );
+  }
+
+  static TextStyle getResponsiveHeadline4(BuildContext context) {
+    return headline4.copyWith(
+      fontSize: ResponsiveUtils.getResponsiveFontSize(context, 18),
+    );
+  }
+
+  static TextStyle getResponsiveBody1(BuildContext context) {
+    return body1.copyWith(
+      fontSize: ResponsiveUtils.getResponsiveFontSize(context, 16),
+    );
+  }
+
+  static TextStyle getResponsiveBody2(BuildContext context) {
+    return body2.copyWith(
+      fontSize: ResponsiveUtils.getResponsiveFontSize(context, 14),
+    );
+  }
+
+  static TextStyle getResponsiveCaption(BuildContext context) {
+    return caption.copyWith(
+      fontSize: ResponsiveUtils.getResponsiveFontSize(context, 12),
+    );
+  }
+
+  static TextStyle getResponsiveButton(BuildContext context) {
+    return button.copyWith(
+      fontSize: ResponsiveUtils.getResponsiveFontSize(context, 14),
+    );
+  }
 
   // ThemeData claro
   static ThemeData get themeData {

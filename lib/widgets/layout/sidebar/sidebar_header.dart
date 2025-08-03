@@ -12,7 +12,7 @@ class SidebarHeader extends StatelessWidget {
       children: [
         // Logo principal no topo da sidebar
         Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           child: Center(
             child: Image.asset(
               isDark ? 'assets/images/logo-dark.png' : 'assets/images/logo.png',
@@ -23,7 +23,7 @@ class SidebarHeader extends StatelessWidget {
         ),
         // Container com informações da empresa
         Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(12),
           margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF2A2A2A) : Colors.blueGrey[50],
@@ -50,7 +50,7 @@ class SidebarHeader extends StatelessWidget {
                   fit: BoxFit.contain,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               _buildCompanyInfo(isDark),
             ],
           ),
