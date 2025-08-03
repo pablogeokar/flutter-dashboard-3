@@ -388,7 +388,7 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
       variant: CardVariant.outlined,
       margin: ResponsiveUtils.getResponsiveMargin(
         context,
-        all: AppTheme.spacingL,
+        all: AppTheme.spacingM,
       ),
       child: Padding(
         padding: EdgeInsets.all(
@@ -515,7 +515,7 @@ class _ContribuicoesScreenState extends State<ContribuicoesScreen> {
             SizedBox(
               height: ResponsiveUtils.getResponsiveSpacing(
                 context,
-                AppTheme.spacingM,
+                AppTheme.spacingS,
               ),
             ),
 

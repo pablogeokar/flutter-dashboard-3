@@ -1,46 +1,64 @@
-//widgets/layout/sidebar/sidebar_header.dart
+// widgets/layout/sidebar/sidebar_header.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dashboard_3/theme.dart';
 import 'package:flutter_dashboard_3/services/database_service.dart';
+import 'package:flutter_dashboard_3/services/logo_manager.dart';
+import 'package:flutter_dashboard_3/theme.dart';
 import 'package:flutter_dashboard_3/utils/responsive_utils.dart';
+
+// GlobalKey para acesso externo (manter para compatibilidade)
+final GlobalKey<SidebarHeaderState> sidebarHeaderKey =
+    GlobalKey<SidebarHeaderState>();
 
 class SidebarHeader extends StatefulWidget {
   const SidebarHeader({super.key});
 
+  // Factory para usar com a GlobalKey automaticamente
+  factory SidebarHeader.withGlobalKey() {
+    return SidebarHeader(key: sidebarHeaderKey);
+  }
+
   @override
-  State<SidebarHeader> createState() => _SidebarHeaderState();
+  State<SidebarHeader> createState() => SidebarHeaderState();
 }
 
-// GlobalKey para acessar o state do SidebarHeader
-final GlobalKey<_SidebarHeaderState> sidebarHeaderKey =
-    GlobalKey<_SidebarHeaderState>();
-
-class _SidebarHeaderState extends State<SidebarHeader> {
-  String _nomeLoja = 'Harmonia, Luz e Sigilo nº 46';
+class SidebarHeaderState extends State<SidebarHeader> {
+  final LogoManager _logoManager = LogoManager();
+  String _nomeLoja = 'Loja Maçônica';
   String _cnpj = 'CNPJ: 12.345.678/0001-90';
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _carregarInformacoesLoja();
+    _carregarInformacoes();
   }
 
-  Future<void> _carregarInformacoesLoja() async {
+  Future<void> _carregarInformacoes() async {
     try {
       final db = DatabaseService();
 
+      // Carregar nome da loja
       final nomeLoja = await db.getValorConfiguracao('nome_loja');
       final cnpj = await db.getValorConfiguracao('cnpj');
 
+      // Carregar caminho da logo
+      final logoPath = await db.getValorConfiguracao('logo_path');
+
       if (mounted) {
         setState(() {
-          _nomeLoja = nomeLoja ?? 'Harmonia, Luz e Sigilo nº 46';
+          _nomeLoja = nomeLoja ?? 'Loja Maçônica';
           _cnpj = 'CNPJ: ${cnpj ?? '12.345.678/0001-90'}';
           _isLoading = false;
         });
+
+        // Atualizar o LogoManager com o caminho atual
+        _logoManager.updateLogoPath(logoPath);
       }
     } catch (e) {
+      if (kDebugMode) {
+        print('Erro ao carregar informações do header: $e');
+      }
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -49,9 +67,9 @@ class _SidebarHeaderState extends State<SidebarHeader> {
     }
   }
 
-  // Método público para atualizar as informações quando necessário
-  void atualizarInformacoes() {
-    _carregarInformacoesLoja();
+  // Método público para atualizar as informações (manter para compatibilidade)
+  Future<void> atualizarInformacoes() async {
+    await _carregarInformacoes();
   }
 
   @override
@@ -102,13 +120,13 @@ class _SidebarHeaderState extends State<SidebarHeader> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Logo da loja centralizada e com melhor proporção
+              // Logo da loja usando o LogoManager
               ClipRRect(
                 borderRadius: BorderRadius.circular(
                   ResponsiveUtils.getResponsiveRadius(context, 12),
                 ),
-                child: Image.asset(
-                  'assets/images/logo-loja.png',
+                child: _logoManager.buildLogoWidget(
+                  width: ResponsiveUtils.getResponsiveHeight(context, 80),
                   height: ResponsiveUtils.getResponsiveHeight(context, 80),
                   fit: BoxFit.contain,
                 ),
@@ -169,128 +187,3 @@ class _SidebarHeaderState extends State<SidebarHeader> {
     );
   }
 }
-
-// // widgets/layout/sidebar/sidebar_header.dart
-// import 'package:flutter/material.dart';
-// import 'package:flutter_dashboard_3/services/database_service.dart';
-// import 'package:flutter_dashboard_3/services/logo_manager.dart';
-// import 'package:flutter_dashboard_3/theme.dart';
-// import 'package:flutter_dashboard_3/utils/responsive_utils.dart';
-
-// // GlobalKey para acesso externo (manter se necessário para compatibilidade)
-// final GlobalKey<SidebarHeaderState> sidebarHeaderKey =
-//     GlobalKey<SidebarHeaderState>();
-
-// class SidebarHeader extends StatefulWidget {
-//   const SidebarHeader({super.key});
-
-//   // Factory para usar com a GlobalKey automaticamente
-//   factory SidebarHeader.withGlobalKey() {
-//     return SidebarHeader(key: sidebarHeaderKey);
-//   }
-
-//   @override
-//   State<SidebarHeader> createState() => SidebarHeaderState();
-// }
-
-// class SidebarHeaderState extends State<SidebarHeader> {
-//   final LogoManager _logoManager = LogoManager();
-//   String _nomeLoja = 'Loja Maçônica';
-//   bool _isLoading = true;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _carregarInformacoes();
-//   }
-
-//   Future<void> _carregarInformacoes() async {
-//     try {
-//       final db = DatabaseService();
-
-//       // Carregar nome da loja
-//       final nomeLoja = await db.getValorConfiguracao('nome_loja');
-
-//       // Carregar caminho da logo
-//       final logoPath = await db.getValorConfiguracao('logo_path');
-
-//       if (mounted) {
-//         setState(() {
-//           _nomeLoja = nomeLoja ?? 'Loja Maçônica';
-//           _isLoading = false;
-//         });
-
-//         // Atualizar o LogoManager com o caminho atual
-//         _logoManager.updateLogoPath(logoPath);
-//       }
-//     } catch (e) {
-//       print('Erro ao carregar informações do header: $e');
-//       if (mounted) {
-//         setState(() {
-//           _isLoading = false;
-//         });
-//       }
-//     }
-//   }
-
-//   // Método público para atualizar as informações (manter para compatibilidade)
-//   Future<void> atualizarInformacoes() async {
-//     await _carregarInformacoes();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     if (_isLoading) {
-//       return Container(
-//         padding: EdgeInsets.all(
-//           ResponsiveUtils.getResponsiveSpacing(context, AppTheme.spacingM),
-//         ),
-//         child: const Center(child: CircularProgressIndicator()),
-//       );
-//     }
-
-//     return Container(
-//       padding: EdgeInsets.all(
-//         ResponsiveUtils.getResponsiveSpacing(context, AppTheme.spacingM),
-//       ),
-//       decoration: BoxDecoration(
-//         color: AppTheme.primaryColor.withOpacity(0.1),
-//         border: Border(
-//           bottom: BorderSide(
-//             color: AppTheme.primaryColor.withOpacity(0.2),
-//             width: 1,
-//           ),
-//         ),
-//       ),
-//       child: Column(
-//         children: [
-//           // Logo da loja usando o LogoManager
-//           _logoManager.buildLogoWidget(
-//             width: ResponsiveUtils.isSmallScreen(context) ? 60 : 80,
-//             height: ResponsiveUtils.isSmallScreen(context) ? 60 : 80,
-//             fit: BoxFit.contain,
-//           ),
-
-//           SizedBox(
-//             height: ResponsiveUtils.getResponsiveSpacing(
-//               context,
-//               AppTheme.spacingM,
-//             ),
-//           ),
-
-//           // Nome da loja
-//           Text(
-//             _nomeLoja,
-//             style: AppTheme.getResponsiveHeadline4(context).copyWith(
-//               color: AppTheme.primaryColor,
-//               fontWeight: FontWeight.bold,
-//             ),
-//             textAlign: TextAlign.center,
-//             maxLines: 2,
-//             overflow: TextOverflow.ellipsis,
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
