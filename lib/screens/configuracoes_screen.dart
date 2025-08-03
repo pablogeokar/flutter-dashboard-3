@@ -1,7 +1,11 @@
-// screens/configuracoes_screen.dart
+// screens/configuracoes_screen.dart - Com serviço de upload
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dashboard_3/services/database_service.dart';
+import 'package:flutter_dashboard_3/services/logo_manager.dart';
+import 'package:flutter_dashboard_3/services/logo_upload_service.dart';
+import 'package:flutter_dashboard_3/models/configuracao.dart';
 import 'package:flutter_dashboard_3/widgets/custom_text_form_field.dart';
 import 'package:flutter_dashboard_3/widgets/custom_button.dart';
 import 'package:flutter_dashboard_3/widgets/custom_card.dart';
@@ -9,8 +13,6 @@ import 'package:flutter_dashboard_3/widgets/custom_loading.dart';
 import 'package:flutter_dashboard_3/theme.dart';
 import 'package:flutter_dashboard_3/utils/responsive_utils.dart';
 import 'package:flutter_dashboard_3/widgets/layout/sidebar/sidebar_header.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 class ConfiguracoesScreen extends StatefulWidget {
@@ -28,8 +30,13 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
 
   bool _isLoading = true;
   bool _isSaving = false;
-  String? _logoPath;
-  final ImagePicker _picker = ImagePicker();
+
+  // Serviços
+  final LogoManager _logoManager = LogoManager();
+  final LogoUploadService _logoUploadService = LogoUploadService();
+
+  // Opções de upload
+  String _selectedUploadOption = 'app_directory'; // Padrão
 
   @override
   void initState() {
@@ -63,9 +70,29 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
           '100.00';
       _nomeLojController.text = nomeLoja ?? 'Loja Maçônica';
       _cnpjController.text = cnpj ?? '01.234.567/0001-89';
-      _logoPath = logoPath;
+
+      // Verificar se o logo existe
+      String? validLogoPath;
+      if (logoPath != null && logoPath.isNotEmpty) {
+        if (await _logoUploadService.logoExists(logoPath)) {
+          validLogoPath = logoPath;
+          if (kDebugMode) {
+            print('Logo carregado: $logoPath');
+          }
+        } else {
+          if (kDebugMode) {
+            print('Arquivo de logo não encontrado: $logoPath');
+          }
+          await db.deleteConfiguracao('logo_path');
+        }
+      }
+
+      _logoManager.updateLogoPath(validLogoPath);
     } catch (e) {
       _mostrarMensagem('Erro ao carregar configurações: $e', Colors.red);
+      if (kDebugMode) {
+        print('Erro detalhado ao carregar configurações: $e');
+      }
     } finally {
       setState(() => _isLoading = false);
     }
@@ -79,39 +106,38 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
     try {
       final db = DatabaseService();
 
-      // Salvar valor da contribuição
-      await db.updateConfiguracao(
+      await _salvarOuAtualizarConfiguracao(
+        db,
         'valor_contribuicao_mensal',
         _valorContribuicaoController.text.replaceAll(',', '.'),
-        descricao: 'Valor da contribuição mensal dos membros da loja',
+        'Valor da contribuição mensal dos membros da loja',
       );
 
-      // Salvar nome da loja
-      await db.updateConfiguracao(
+      await _salvarOuAtualizarConfiguracao(
+        db,
         'nome_loja',
         _nomeLojController.text.trim(),
-        descricao: 'Nome da loja maçônica',
+        'Nome da loja maçônica',
       );
 
-      // Salvar CNPJ
-      await db.updateConfiguracao(
+      await _salvarOuAtualizarConfiguracao(
+        db,
         'cnpj',
         _cnpjController.text.trim(),
-        descricao: 'CNPJ',
+        'CNPJ da loja',
       );
 
-      // Salvar caminho do logo se houver
-      if (_logoPath != null) {
-        await db.updateConfiguracao(
+      final currentLogoPath = _logoManager.currentLogoPath;
+      if (currentLogoPath != null) {
+        await _salvarOuAtualizarConfiguracao(
+          db,
           'logo_path',
-          _logoPath!,
-          descricao: 'Caminho do logo da loja',
+          currentLogoPath,
+          'Caminho do logo da loja',
         );
       }
 
       _mostrarMensagem('Configurações salvas com sucesso!', Colors.green);
-
-      // Atualizar o header da sidebar se estiver disponível
       _atualizarSidebarHeader();
     } catch (e) {
       _mostrarMensagem('Erro ao salvar configurações: $e', Colors.red);
@@ -120,100 +146,122 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
     }
   }
 
-  Future<void> _selecionarLogo() async {
+  Future<void> _salvarOuAtualizarConfiguracao(
+    DatabaseService db,
+    String chave,
+    String valor,
+    String descricao,
+  ) async {
     try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
+      final result = await db.updateConfiguracao(
+        chave,
+        valor,
+        descricao: descricao,
       );
 
-      if (image != null) {
-        // Obter diretório de documentos da aplicação
-        final Directory appDocDir = await getApplicationDocumentsDirectory();
-        final String appDocPath = appDocDir.path;
-
-        // Criar diretório para logos se não existir
-        final Directory logoDir = Directory('$appDocPath/logos');
-        if (!await logoDir.exists()) {
-          await logoDir.create(recursive: true);
-        }
-
-        // Definir nome do arquivo
-        final String fileName = 'logo-loja.png';
-        final String newPath = '${logoDir.path}/$fileName';
-
-        // Copiar arquivo selecionado para o diretório da aplicação
-        final File newFile = await File(image.path).copy(newPath);
-
-        setState(() {
-          _logoPath = newFile.path;
-        });
-
-        _mostrarMensagem('Logo selecionado com sucesso!', Colors.green);
+      if (result == 0) {
+        final novaConfiguracao = Configuracao(
+          chave: chave,
+          valor: valor,
+          descricao: descricao,
+          dataAtualizacao: DateTime.now(),
+        );
+        await db.insertConfiguracao(novaConfiguracao);
       }
     } catch (e) {
-      _mostrarMensagem('Erro ao selecionar logo: $e', Colors.red);
+      if (kDebugMode) {
+        print('Erro ao salvar configuração $chave: $e');
+      }
+      rethrow;
     }
+  }
+
+  Future<void> _selecionarLogo() async {
+    try {
+      String? logoPath;
+
+      // Fazer upload baseado na opção selecionada
+      switch (_selectedUploadOption) {
+        case 'app_directory':
+          logoPath = await _logoUploadService.uploadLogoToAppDirectory();
+          break;
+
+        case 'system_directory':
+          logoPath = await _logoUploadService.uploadLogoToSystemDirectory();
+          break;
+
+        case 'assets':
+          logoPath = await _logoUploadService.uploadLogoToAssets();
+          break;
+
+        case 'custom':
+          // Permitir que o usuário escolha uma pasta
+          logoPath = await _selecionarPastaCustomizada();
+          break;
+
+        default:
+          logoPath = await _logoUploadService.uploadLogoToAppDirectory();
+      }
+
+      if (logoPath != null) {
+        // Atualizar o LogoManager
+        _logoManager.updateLogoPath(logoPath);
+
+        // Salvar no banco de dados
+        final db = DatabaseService();
+        await _salvarOuAtualizarConfiguracao(
+          db,
+          'logo_path',
+          logoPath,
+          'Caminho do logo da loja',
+        );
+
+        _mostrarMensagem(
+          'Logo enviado e salvo com sucesso!\nSalvo em: $logoPath',
+          Colors.green,
+        );
+
+        _atualizarSidebarHeader();
+      }
+    } catch (e) {
+      _mostrarMensagem('Erro ao enviar logo: $e', Colors.red);
+      if (kDebugMode) {
+        print('Erro detalhado ao enviar logo: $e');
+      }
+    }
+  }
+
+  Future<String?> _selecionarPastaCustomizada() async {
+    // Aqui você pode implementar um seletor de pasta
+    // Por simplicidade, vou usar uma pasta padrão customizada
+    final customPath = Platform.isWindows
+        ? 'C:\\LojaApp\\logos'
+        : '/opt/loja-app';
+
+    return await _logoUploadService.uploadLogoToCustomDirectory(customPath);
   }
 
   Future<void> _removerLogo() async {
     try {
-      if (_logoPath != null) {
-        final File logoFile = File(_logoPath!);
-        if (await logoFile.exists()) {
-          await logoFile.delete();
-        }
+      final currentLogoPath = _logoManager.currentLogoPath;
+
+      if (currentLogoPath != null) {
+        await _logoUploadService.removeLogo(currentLogoPath);
       }
 
-      setState(() {
-        _logoPath = null;
-      });
+      _logoManager.updateLogoPath(null);
 
-      // Remover da configuração no banco
       final db = DatabaseService();
       await db.deleteConfiguracao('logo_path');
 
       _mostrarMensagem('Logo removido com sucesso!', Colors.green);
+      _atualizarSidebarHeader();
     } catch (e) {
       _mostrarMensagem('Erro ao remover logo: $e', Colors.red);
     }
   }
 
-  Widget _getCurrentLogo() {
-    // Primeiro, verificar se há um logo personalizado
-    if (_logoPath != null && File(_logoPath!).existsSync()) {
-      return Image.file(
-        File(_logoPath!),
-        width: 120,
-        height: 120,
-        fit: BoxFit.contain,
-      );
-    }
-
-    // Caso contrário, usar o logo padrão dos assets
-    return Image.asset(
-      'assets/images/logo-loja.png',
-      width: 120,
-      height: 120,
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) {
-        return Container(
-          width: 120,
-          height: 120,
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Icon(Icons.business, size: 60, color: Colors.grey),
-        );
-      },
-    );
-  }
-
   void _atualizarSidebarHeader() {
-    // Atualizar o header da sidebar usando a GlobalKey
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final sidebarHeaderState = sidebarHeaderKey.currentState;
       if (sidebarHeaderState != null) {
@@ -228,10 +276,75 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
         SnackBar(
           content: Text(mensagem),
           backgroundColor: cor,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 4),
         ),
       );
     }
+  }
+
+  Widget _buildUploadOptionsCard() {
+    return _buildSectionCard(
+      title: 'Opções de Upload',
+      icon: Icons.settings,
+      children: [
+        Text(
+          'Escolha onde salvar o logo:',
+          style: AppTheme.getResponsiveBody1(
+            context,
+          ).copyWith(fontWeight: FontWeight.w500),
+        ),
+        SizedBox(
+          height: ResponsiveUtils.getResponsiveSpacing(
+            context,
+            AppTheme.spacingM,
+          ),
+        ),
+
+        // Pasta da aplicação
+        RadioListTile<String>(
+          value: 'app_directory',
+          groupValue: _selectedUploadOption,
+          onChanged: (value) => setState(() => _selectedUploadOption = value!),
+          title: const Text('Pasta da Aplicação'),
+          subtitle: const Text('Salva na pasta onde está o executável'),
+        ),
+
+        // Pasta do sistema
+        RadioListTile<String>(
+          value: 'system_directory',
+          groupValue: _selectedUploadOption,
+          onChanged: (value) => setState(() => _selectedUploadOption = value!),
+          title: const Text('Pasta do Sistema'),
+          subtitle: Text(
+            Platform.isWindows
+                ? 'C:\\ProgramData\\LojaApp\\logos'
+                : Platform.isLinux
+                ? '/opt/loja-app/logos'
+                : '/Applications/LojaApp/logos',
+          ),
+        ),
+
+        // Assets (para build)
+        RadioListTile<String>(
+          value: 'assets',
+          groupValue: _selectedUploadOption,
+          onChanged: (value) => setState(() => _selectedUploadOption = value!),
+          title: const Text('Pasta Assets'),
+          subtitle: const Text(
+            'Inclui no build da aplicação (assets/images/custom)',
+          ),
+        ),
+
+        // Customizada
+        RadioListTile<String>(
+          value: 'custom',
+          groupValue: _selectedUploadOption,
+          onChanged: (value) => setState(() => _selectedUploadOption = value!),
+          title: const Text('Pasta Customizada'),
+          subtitle: const Text('Permite escolher uma pasta específica'),
+        ),
+      ],
+    );
   }
 
   @override
@@ -279,7 +392,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Preview do logo atual
+                        // Preview do logo
                         Container(
                           padding: EdgeInsets.all(
                             ResponsiveUtils.getResponsiveSpacing(
@@ -289,8 +402,8 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                           ),
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: Colors.grey[300]!,
-                              width: 2,
+                              color: Colors.grey[700]!,
+                              width: 1,
                             ),
                             borderRadius: BorderRadius.circular(
                               ResponsiveUtils.getResponsiveRadius(
@@ -299,7 +412,11 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                               ),
                             ),
                           ),
-                          child: _getCurrentLogo(),
+                          child: _logoManager.buildLogoWidget(
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                         SizedBox(
                           width: ResponsiveUtils.getResponsiveSpacing(
@@ -307,7 +424,8 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                             AppTheme.spacingL,
                           ),
                         ),
-                        // Botões de ação
+
+                        // Informações e botões
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -324,89 +442,89 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                                   AppTheme.spacingS,
                                 ),
                               ),
-                              Text(
-                                _logoPath != null
-                                    ? 'Logo personalizado carregado'
-                                    : 'Usando logo padrão',
-                                style: AppTheme.getResponsiveBody2(
-                                  context,
-                                ).copyWith(color: Colors.grey[600]),
+
+                              // Status e path do logo
+                              ValueListenableBuilder<String?>(
+                                valueListenable: _logoManager.logoPathNotifier,
+                                builder: (context, logoPath, child) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        logoPath != null
+                                            ? 'Logo personalizado carregado'
+                                            : 'Usando logo padrão',
+                                        style: AppTheme.getResponsiveBody2(
+                                          context,
+                                        ).copyWith(color: Colors.grey[600]),
+                                      ),
+                                      if (logoPath != null) ...[
+                                        SizedBox(
+                                          height:
+                                              ResponsiveUtils.getResponsiveSpacing(
+                                                context,
+                                                AppTheme.spacingXS,
+                                              ),
+                                        ),
+                                        Text(
+                                          'Caminho: $logoPath',
+                                          style: AppTheme.getResponsiveCaption(
+                                            context,
+                                          ).copyWith(color: Colors.grey[500]),
+                                        ),
+                                      ],
+                                    ],
+                                  );
+                                },
                               ),
+
                               SizedBox(
                                 height: ResponsiveUtils.getResponsiveSpacing(
                                   context,
                                   AppTheme.spacingM,
                                 ),
                               ),
+
+                              // Botões
                               CustomButton(
-                                text: 'Alterar Logo',
+                                text: 'Enviar Logo',
                                 variant: ButtonVariant.primary,
                                 icon: Icons.upload,
                                 onPressed: _isSaving ? null : _selecionarLogo,
                               ),
-                              if (_logoPath != null) ...[
-                                SizedBox(
-                                  height: ResponsiveUtils.getResponsiveSpacing(
-                                    context,
-                                    AppTheme.spacingS,
-                                  ),
-                                ),
-                                CustomButton(
-                                  text: 'Remover Logo',
-                                  variant: ButtonVariant.outline,
-                                  icon: Icons.delete_outline,
-                                  onPressed: _isSaving ? null : _removerLogo,
-                                ),
-                              ],
+
+                              ValueListenableBuilder<String?>(
+                                valueListenable: _logoManager.logoPathNotifier,
+                                builder: (context, logoPath, child) {
+                                  if (logoPath != null) {
+                                    return Column(
+                                      children: [
+                                        SizedBox(
+                                          height:
+                                              ResponsiveUtils.getResponsiveSpacing(
+                                                context,
+                                                AppTheme.spacingS,
+                                              ),
+                                        ),
+                                        CustomButton(
+                                          text: 'Remover Logo',
+                                          variant: ButtonVariant.outline,
+                                          icon: Icons.delete_outline,
+                                          onPressed: _isSaving
+                                              ? null
+                                              : _removerLogo,
+                                        ),
+                                      ],
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                },
+                              ),
                             ],
                           ),
                         ),
                       ],
-                    ),
-                    SizedBox(
-                      height: ResponsiveUtils.getResponsiveSpacing(
-                        context,
-                        AppTheme.spacingM,
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(
-                        ResponsiveUtils.getResponsiveSpacing(
-                          context,
-                          AppTheme.spacingM,
-                        ),
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppTheme.info.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(
-                          ResponsiveUtils.getResponsiveRadius(
-                            context,
-                            AppTheme.radiusM,
-                          ),
-                        ),
-                        border: Border.all(
-                          color: AppTheme.info.withValues(alpha: 0.3),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.info_outline, color: AppTheme.info),
-                          SizedBox(
-                            width: ResponsiveUtils.getResponsiveSpacing(
-                              context,
-                              AppTheme.spacingS,
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              'O logo será exibido no cabeçalho da aplicação e nos relatórios. Recomenda-se usar imagens em formato PNG com fundo transparente.',
-                              style: AppTheme.getResponsiveBody2(
-                                context,
-                              ).copyWith(color: AppTheme.info),
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
                   ],
                 ),
@@ -418,7 +536,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                   ),
                 ),
 
-                // Card de Configurações Gerais
+                // Cards de configurações gerais e financeiras...
                 _buildSectionCard(
                   title: 'Configurações Gerais',
                   icon: Icons.settings,
@@ -463,7 +581,6 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                   ),
                 ),
 
-                // Card de Configurações Financeiras
                 _buildSectionCard(
                   title: 'Configurações Financeiras',
                   icon: Icons.monetization_on,
@@ -494,58 +611,22 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(
-                      height: ResponsiveUtils.getResponsiveSpacing(
-                        context,
-                        AppTheme.spacingM,
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(
-                        ResponsiveUtils.getResponsiveSpacing(
-                          context,
-                          AppTheme.spacingM,
-                        ),
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppTheme.info.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(
-                          ResponsiveUtils.getResponsiveRadius(
-                            context,
-                            AppTheme.radiusM,
-                          ),
-                        ),
-                        border: Border.all(
-                          color: AppTheme.info.withValues(alpha: 0.3),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.info_outline, color: AppTheme.info),
-                          SizedBox(
-                            width: ResponsiveUtils.getResponsiveSpacing(
-                              context,
-                              AppTheme.spacingS,
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              'Este valor será usado como padrão ao gerar as contribuições mensais para todos os membros ativos.',
-                              style: AppTheme.getResponsiveBody2(
-                                context,
-                              ).copyWith(color: AppTheme.info),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
 
                 SizedBox(
                   height: ResponsiveUtils.getResponsiveSpacing(
                     context,
-                    AppTheme.spacingXL,
+                    AppTheme.spacingS,
+                  ),
+                ),
+
+                // Card de opções de upload
+                _buildUploadOptionsCard(),
+                SizedBox(
+                  height: ResponsiveUtils.getResponsiveSpacing(
+                    context,
+                    AppTheme.spacingS,
                   ),
                 ),
 
@@ -625,12 +706,12 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
       margin: EdgeInsets.only(
         bottom: ResponsiveUtils.getResponsiveSpacing(
           context,
-          AppTheme.spacingL,
+          AppTheme.spacingS,
         ),
       ),
       child: Padding(
         padding: EdgeInsets.all(
-          ResponsiveUtils.getResponsiveSpacing(context, AppTheme.spacingL),
+          ResponsiveUtils.getResponsiveSpacing(context, AppTheme.spacingM),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
