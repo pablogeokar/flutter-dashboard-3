@@ -29,9 +29,6 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     Widget buttonChild = _buildButtonChild();
 
     switch (variant) {
@@ -149,9 +146,6 @@ class CustomButton extends StatelessWidget {
   }
 
   ButtonStyle _getOutlinedButtonStyle(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return OutlinedButton.styleFrom(
       foregroundColor: AppTheme.primaryColor,
       side: BorderSide(color: AppTheme.primaryColor),

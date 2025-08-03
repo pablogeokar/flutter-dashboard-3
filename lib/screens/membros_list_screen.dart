@@ -350,22 +350,22 @@ class _MembrosListScreenState extends State<MembrosListScreen> {
                   },
                 ),
               ),
-              const SizedBox(width: 16),
-              Container(
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF2A2A2A)
-                      : colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: colorScheme.outline),
-                ),
-                child: IconButton(
-                  onPressed: _carregarMembros,
-                  icon: const Icon(Icons.refresh, color: Color(0xFF00BCD4)),
-                  tooltip: 'Atualizar',
-                  iconSize: 24,
-                ),
-              ),
+              // const SizedBox(width: 16),
+              // Container(
+              //   decoration: BoxDecoration(
+              //     color: isDark
+              //         ? const Color(0xFF2A2A2A)
+              //         : colorScheme.surfaceContainerHighest,
+              //     borderRadius: BorderRadius.circular(12),
+              //     border: Border.all(color: colorScheme.outline),
+              //   ),
+              //   child: IconButton(
+              //     onPressed: _carregarMembros,
+              //     icon: const Icon(Icons.refresh, color: Color(0xFF00BCD4)),
+              //     tooltip: 'Atualizar',
+              //     iconSize: 24,
+              //   ),
+              // ),
             ],
           ),
         ],
